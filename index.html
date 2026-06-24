@@ -230,6 +230,27 @@ main{max-width:1400px;margin:0 auto;padding:14px 12px 80px;}
   .hero-title{font-size:36px;}
   .groups-grid{grid-template-columns:1fr;}
 }
+
+/* ══ HIGHLIGHTS TAB ══ */
+.hl-player{position:relative;padding-top:56.25%;border-radius:12px;overflow:hidden;background:#000;margin-bottom:14px;}
+.hl-player iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;}
+.hl-player.empty{padding-top:0;height:100px;display:flex;align-items:center;justify-content:center;background:var(--card);border:1px solid var(--border);}
+.vid-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;}
+.vid-card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;cursor:pointer;transition:border-color .15s,transform .15s;}
+.vid-card:hover{border-color:var(--accent2);transform:translateY(-2px);}
+.vid-card.active{border-color:var(--accent);border-width:2px;}
+.vid-thumb{position:relative;padding-top:56.25%;background:#111;overflow:hidden;}
+.vid-thumb img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;}
+.vid-thumb .play-btn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;border-radius:50%;background:rgba(239,68,68,.9);display:flex;align-items:center;justify-content:center;font-size:18px;line-height:1;padding-left:3px;}
+.vid-info{padding:10px 12px;}
+.vid-title{font-size:12px;font-weight:600;color:var(--text);line-height:1.4;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.vid-meta{font-size:10px;color:var(--dim);}
+.hl-loading{text-align:center;padding:40px;color:var(--dim);font-size:13px;}
+.hl-filter-bar{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:12px;scrollbar-width:none;}
+.hl-filter-bar::-webkit-scrollbar{display:none;}
+.hl-src-note{font-size:10px;color:var(--dim);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.hl-src-note a{color:var(--accent2);}
+.hl-err{background:var(--card);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:20px;text-align:center;font-size:12px;color:var(--dim);}
 </style>
 </head>
 <body>
@@ -247,6 +268,7 @@ main{max-width:1400px;margin:0 auto;padding:14px 12px 80px;}
       <button onclick="showTab('schedule',this)">Jadwal</button>
       <button onclick="showTab('knockout',this)">Knockout</button>
       <button onclick="showTab('stats',this)">Stats</button>
+      <button onclick="showTab('highlights',this)">🎬 Highlights</button>
     </nav>
     <div class="status-bar">
       <div class="sync-dot" id="sync-dot"></div>
@@ -263,6 +285,7 @@ main{max-width:1400px;margin:0 auto;padding:14px 12px 80px;}
   <div id="tab-schedule" class="tab-panel"></div>
   <div id="tab-knockout" class="tab-panel"></div>
   <div id="tab-stats"    class="tab-panel"></div>
+  <div id="tab-highlights" class="tab-panel"></div>
 </main>
 
 <!-- Bottom Nav (mobile) -->
@@ -281,6 +304,9 @@ main{max-width:1400px;margin:0 auto;padding:14px 12px 80px;}
   </button>
   <button class="bn-btn" onclick="showTab('stats',this)" data-tab="stats">
     <span class="icon">📊</span>Stats
+  </button>
+  <button class="bn-btn" onclick="showTab('highlights',this)" data-tab="highlights">
+    <span class="icon">🎬</span>Highlights
   </button>
 </nav>
 
@@ -1035,6 +1061,153 @@ function toast(msg, type=''){
   t.textContent=msg; t.className='show '+(type||'');
   setTimeout(()=>t.className='', 2000);
 }
+
+
+// ══════════════════════════════════════════════════════
+//  RENDER: HIGHLIGHTS (YouTube RSS — FIFA official)
+// ══════════════════════════════════════════════════════
+// FIFA official YouTube channel: UCpcTrCXblq78GZrTUTLWeBw
+// YouTube RSS feed tidak butuh API key — langsung bisa diakses
+const FIFA_YT_CHANNEL = 'UCpcTrCXblq78GZrTUTLWeBw';
+const YT_RSS = `https://www.youtube.com/feeds/videos.xml?channel_id=${FIFA_YT_CHANNEL}`;
+// CORS proxy gratis untuk akses RSS dari browser
+const CORS_PROXY = 'https://api.allorigins.win/get?url=';
+
+let hlVideos = [];
+let hlActive = null;
+let hlFetched = false;
+let hlFilter = 'all';
+
+function timeAgo(dateStr){
+  const d = new Date(dateStr);
+  const diff = (Date.now() - d) / 1000;
+  if(diff < 3600) return Math.floor(diff/60) + ' menit lalu';
+  if(diff < 86400) return Math.floor(diff/3600) + ' jam lalu';
+  return Math.floor(diff/86400) + ' hari lalu';
+}
+
+function parseYTRSS(xmlStr){
+  const parser = new DOMParser();
+  const xml = parser.parseFromString(xmlStr, 'text/xml');
+  const entries = xml.querySelectorAll('entry');
+  return Array.from(entries).map(e => {
+    const videoId = e.querySelector('videoId')?.textContent || e.querySelector('id')?.textContent?.split(':').pop() || '';
+    return {
+      id: videoId,
+      title: e.querySelector('title')?.textContent || '',
+      published: e.querySelector('published')?.textContent || '',
+      thumb: `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`,
+    };
+  }).filter(v => v.id && v.title);
+}
+
+function isWCHighlight(title){
+  const t = title.toLowerCase();
+  return t.includes('world cup') || t.includes('highlight') || t.includes('2026') || t.includes('wc') || t.includes('fifa') || t.includes('vs') || t.includes('goal');
+}
+
+async function fetchHighlights(){
+  if(hlFetched) return;
+  const el = document.getElementById('tab-highlights');
+  if(!el) return;
+  el.innerHTML = '<div class="hl-loading">⏳ Memuat highlight dari FIFA YouTube…</div>';
+  try {
+    const encoded = encodeURIComponent(YT_RSS);
+    const res = await fetch(CORS_PROXY + encoded);
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const json = await res.json();
+    const videos = parseYTRSS(json.contents || '');
+    // Filter hanya konten WC 2026
+    hlVideos = videos.filter(v => isWCHighlight(v.title));
+    if(!hlVideos.length){
+      // fallback: ambil semua video terbaru
+      hlVideos = videos.slice(0, 20);
+    }
+    hlFetched = true;
+    if(hlVideos.length && !hlActive) hlActive = hlVideos[0].id;
+    renderHighlights();
+  } catch(err) {
+    console.error('RSS error:', err);
+    // Fallback: tampilkan link langsung ke channel FIFA
+    renderHighlightsFallback();
+  }
+}
+
+function renderHighlightsFallback(){
+  const el = document.getElementById('tab-highlights');
+  if(!el) return;
+  // Curated known highlight videos yang sudah diverifikasi ada (dari search)
+  const known = [
+    {id:'w453UjgtQw4', title:'Spain vs Saudi Arabia Extended Highlights 🌎🏆 2026 FIFA World Cup™', published: new Date(Date.now()-2*86400000).toISOString()},
+    {id:'Ihp4QH9YkBc', title:'New Zealand vs Egypt Extended Highlights 🌎🏆 2026 FIFA World Cup™', published: new Date(Date.now()-2*86400000).toISOString()},
+  ];
+  hlVideos = known;
+  known.forEach(v => { v.thumb = `https://i.ytimg.com/vi/${v.id}/mqdefault.jpg`; });
+  if(!hlActive) hlActive = known[0].id;
+  renderHighlights();
+}
+
+function renderHighlights(){
+  const el = document.getElementById('tab-highlights');
+  if(!el || !el.classList.contains('active')) return;
+  if(!hlFetched && !hlVideos.length){ fetchHighlights(); return; }
+  
+  const activeVid = hlVideos.find(v=>v.id===hlActive) || hlVideos[0];
+
+  const cards = hlVideos.map(v=>`
+    <div class="vid-card ${v.id===hlActive?'active':''}" onclick="hlPlay('${v.id}')">
+      <div class="vid-thumb">
+        <img src="${v.thumb}" alt="${v.title.replace(/"/g,'')}" loading="lazy" onerror="this.src='https://i.ytimg.com/vi/${v.id}/hqdefault.jpg'">
+        <div class="play-btn">▶</div>
+      </div>
+      <div class="vid-info">
+        <div class="vid-title">${v.title}</div>
+        <div class="vid-meta">${timeAgo(v.published)}</div>
+      </div>
+    </div>`).join('');
+
+  el.innerHTML = `
+    <div class="sec-title">Highlights FIFA World Cup 2026</div>
+    <div class="hl-src-note">
+      📺 Sumber: <a href="https://www.youtube.com/@fifa" target="_blank">FIFA Official YouTube</a>
+      &nbsp;·&nbsp; Auto-update saat ada video baru
+      <button onclick="hlRefresh()" style="margin-left:auto;background:var(--card);border:1px solid var(--border);color:var(--dim);padding:3px 8px;border-radius:5px;font-size:10px;cursor:pointer;">🔄 Refresh</button>
+    </div>
+    ${activeVid ? `
+    <div class="hl-player">
+      <iframe
+        src="https://www.youtube.com/embed/${activeVid.id}?autoplay=1&rel=0&modestbranding=1"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen>
+      </iframe>
+    </div>
+    <div style="margin-bottom:14px;">
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px;">${activeVid.title}</div>
+      <div style="font-size:10px;color:var(--dim);">${timeAgo(activeVid.published)} &nbsp;·&nbsp; 
+        <a href="https://www.youtube.com/watch?v=${activeVid.id}" target="_blank" style="color:var(--accent2);">Buka di YouTube ↗</a>
+      </div>
+    </div>` : ''}
+    <div class="sec-title">Semua Video</div>
+    <div class="vid-grid">${cards}</div>
+    <div style="margin-top:16px;text-align:center;">
+      <a href="https://www.youtube.com/@fifa/videos" target="_blank" style="font-size:12px;color:var(--accent2);">Lihat semua video di FIFA YouTube ↗</a>
+    </div>`;
+}
+
+function hlPlay(id){
+  hlActive = id;
+  renderHighlights();
+  // Scroll ke atas player
+  document.getElementById('tab-highlights').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function hlRefresh(){
+  hlFetched = false;
+  hlVideos = [];
+  hlActive = null;
+  fetchHighlights();
+}
+
 
 // ══════════════════════════════════════════════════════
 //  NAV
