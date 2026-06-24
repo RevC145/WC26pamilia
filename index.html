@@ -251,7 +251,7 @@ main{max-width:1400px;margin:0 auto;padding:14px 12px 80px;}
     <div class="status-bar">
       <div class="sync-dot" id="sync-dot"></div>
       <span class="sync-label" id="sync-label">Menghubungkan…</span>
-      <div class="progress-badge" id="progress-badge">0/72</div>
+      <div class="progress-badge" id="progress-badge">48/72</div>
     </div>
   </div>
 </header>
@@ -455,7 +455,59 @@ const GM=[
 // ══════════════════════════════════════════════════════
 //  STATE
 // ══════════════════════════════════════════════════════
-let scores = {}; // group stage scores: { matchId: {home, away, live, elapsed} }
+// Skor hasil pertandingan s/d 24 Juni 2026 (pre-loaded, akan di-override oleh API)
+let scores = {
+  // MATCHDAY 1
+  1:{home:2,away:0,done:true,live:false},  // Mexico 2-0 South Africa
+  2:{home:2,away:1,done:true,live:false},  // Korea Republic 2-1 Czech Republic
+  3:{home:1,away:1,done:true,live:false},  // Canada 1-1 Bosnia and Herzegovina
+  4:{home:4,away:1,done:true,live:false},  // United States 4-1 Paraguay
+  5:{home:0,away:1,done:true,live:false},  // Haiti 0-1 Scotland
+  6:{home:2,away:0,done:true,live:false},  // Australia 2-0 Turkey
+  7:{home:1,away:1,done:true,live:false},  // Brazil 1-1 Morocco
+  8:{home:1,away:1,done:true,live:false},  // Qatar 1-1 Switzerland
+  9:{home:1,away:0,done:true,live:false},  // Ivory Coast 1-0 Ecuador
+  10:{home:7,away:1,done:true,live:false}, // Germany 7-1 Curacao
+  11:{home:2,away:2,done:true,live:false}, // Netherlands 2-2 Japan
+  12:{home:5,away:1,done:true,live:false}, // Sweden 5-1 Tunisia
+  13:{home:1,away:1,done:true,live:false}, // Saudi Arabia 1-1 Uruguay
+  14:{home:0,away:0,done:true,live:false}, // Spain 0-0 Cape Verde
+  15:{home:2,away:2,done:true,live:false}, // Iran 2-2 New Zealand
+  16:{home:1,away:1,done:true,live:false}, // Belgium 1-1 Egypt
+  17:{home:3,away:1,done:true,live:false}, // France 3-1 Senegal
+  18:{home:1,away:4,done:true,live:false}, // Iraq 1-4 Norway
+  19:{home:3,away:0,done:true,live:false}, // Argentina 3-0 Algeria
+  20:{home:3,away:1,done:true,live:false}, // Austria 3-1 Jordan
+  21:{home:1,away:0,done:true,live:false}, // Ghana 1-0 Panama
+  22:{home:4,away:2,done:true,live:false}, // England 4-2 Croatia
+  23:{home:1,away:1,done:true,live:false}, // Portugal 1-1 DR Congo
+  24:{home:1,away:3,done:true,live:false}, // Uzbekistan 1-3 Colombia
+  // MATCHDAY 2
+  25:{home:1,away:1,done:true,live:false}, // Czech Republic 1-1 South Africa
+  26:{home:4,away:1,done:true,live:false}, // Switzerland 4-1 Bosnia and Herzegovina
+  27:{home:6,away:0,done:true,live:false}, // Canada 6-0 Qatar
+  28:{home:1,away:0,done:true,live:false}, // Mexico 1-0 Korea Republic
+  29:{home:3,away:0,done:true,live:false}, // Brazil 3-0 Haiti
+  30:{home:0,away:1,done:true,live:false}, // Scotland 0-1 Morocco
+  31:{home:2,away:0,done:true,live:false}, // United States 2-0 Australia
+  32:{home:0,away:1,done:true,live:false}, // Turkey 0-1 Paraguay
+  33:{home:2,away:1,done:true,live:false}, // Germany 2-1 Ivory Coast
+  34:{home:0,away:0,done:true,live:false}, // Ecuador 0-0 Curacao
+  35:{home:5,away:1,done:true,live:false}, // Netherlands 5-1 Sweden
+  36:{home:0,away:4,done:true,live:false}, // Tunisia 0-4 Japan
+  37:{home:2,away:2,done:true,live:false}, // Uruguay 2-2 Cape Verde
+  38:{home:4,away:0,done:true,live:false}, // Spain 4-0 Saudi Arabia
+  39:{home:0,away:0,done:true,live:false}, // Belgium 0-0 Iran
+  40:{home:1,away:3,done:true,live:false}, // New Zealand 1-3 Egypt
+  41:{home:3,away:2,done:true,live:false}, // Norway 3-2 Senegal
+  42:{home:3,away:0,done:true,live:false}, // France 3-0 Iraq
+  43:{home:2,away:0,done:true,live:false}, // Argentina 2-0 Austria
+  44:{home:1,away:2,done:true,live:false}, // Jordan 1-2 Algeria
+  45:{home:0,away:0,done:true,live:false}, // England 0-0 Ghana
+  46:{home:0,away:1,done:true,live:false}, // Panama 0-1 Croatia
+  47:{home:5,away:0,done:true,live:false}, // Portugal 5-0 Uzbekistan
+  48:{home:3,away:1,done:true,live:false}, // Colombia 3-1 DR Congo
+}; // group stage scores
 let koScores = {}; // knockout scores
 let liveMatches = []; // currently live match IDs
 let lastFetch = null;
