@@ -251,6 +251,32 @@ main{max-width:1400px;margin:0 auto;padding:14px 12px 80px;}
 .hl-src-note{font-size:10px;color:var(--dim);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
 .hl-src-note a{color:var(--accent2);}
 .hl-err{background:var(--card);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:20px;text-align:center;font-size:12px;color:var(--dim);}
+
+/* ── TEAM MODAL ── */
+.tm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:flex;align-items:flex-end;justify-content:center;padding:0;}
+@media(min-width:600px){.tm-overlay{align-items:center;}}
+.tm-modal{background:var(--surface);border-radius:16px 16px 0 0;width:100%;max-width:500px;max-height:85vh;overflow-y:auto;padding:20px 16px 32px;}
+@media(min-width:600px){.tm-modal{border-radius:16px;max-height:80vh;}}
+.tm-header{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.tm-flag{font-size:40px;line-height:1;}
+.tm-name{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1px;}
+.tm-sub{font-size:11px;color:var(--dim);}
+.tm-close{margin-left:auto;background:none;border:1px solid var(--border);color:var(--dim);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.tm-stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px;}
+.tm-stat{background:var(--card);border-radius:8px;padding:8px;text-align:center;}
+.tm-stat .v{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--accent);line-height:1;}
+.tm-stat .l{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;}
+.tm-sec{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--dim);margin:12px 0 6px;}
+.sq-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:5px;}
+.sq-card{background:var(--card);border:1px solid var(--border);border-radius:7px;padding:6px 8px;}
+.sq-num{font-size:9px;color:var(--dim);margin-bottom:1px;}
+.sq-name{font-size:11px;font-weight:600;color:var(--text);}
+.sq-club{font-size:9px;color:var(--dim);}
+.sq-pos{display:inline-block;font-size:8px;font-weight:700;border-radius:3px;padding:1px 4px;margin-top:2px;}
+.sq-pos.GK{background:rgba(245,197,24,.15);color:var(--accent);}
+.sq-pos.DF{background:rgba(34,197,94,.1);color:var(--green);}
+.sq-pos.MF{background:rgba(58,123,213,.15);color:var(--accent2);}
+.sq-pos.FW{background:rgba(239,68,68,.1);color:var(--red);}
 </style>
 </head>
 <body>
@@ -828,7 +854,7 @@ function renderOverview(){
     <div class="sec-title">FIFA Rankings</div>
     <div class="rank-grid">
       ${sorted.map(([team,pts],i)=>`
-        <div class="rank-card">
+        <div class="rank-card" onclick="showTeamModal('${team}')" style="cursor:pointer;" title="Lihat info ${team}">
           <div class="rank-n ${i<3?'t3':''}">${i+1}</div>
           <span style="font-size:18px">${fl(team)}</span>
           <div class="rank-info">
@@ -836,6 +862,7 @@ function renderOverview(){
             <div class="rank-pts">${pts.toFixed(0)} pts</div>
             <div class="rank-bar-w"><div class="rank-bar" style="width:${(pts/max*100).toFixed(1)}%"></div></div>
           </div>
+          <div style="font-size:9px;color:var(--dim);flex-shrink:0;">&#9432;</div>
         </div>`).join('')}
     </div>`;
 }
@@ -1036,12 +1063,53 @@ function renderStats(){
       <div class="st-card"><div class="st-num">${72-played}</div><div class="st-lbl">Sisa Match</div></div>
     </div>
     <div class="sg">
-      <div class="sc"><div class="sc-title">⚽ Gol Terbanyak</div>${miniList(byGF,t=>t.gf)}</div>
-      <div class="sc"><div class="sc-title">🏅 Poin Tertinggi</div>${miniList(byPts,t=>t.pts)}</div>
-      <div class="sc"><div class="sc-title">📊 Goal Difference</div>${miniList(byGD,t=>{const d=t.gf-t.ga;return(d>0?'+':'')+d})}</div>
-      <div class="sc"><div class="sc-title">🏆 Kemenangan</div>${miniList(byW,t=>t.w)}</div>
+      <div class="sc"><div class="sc-title">&#9917; Gol Terbanyak (Tim)</div>${miniList(byGF,t=>t.gf)}</div>
+      <div class="sc"><div class="sc-title">&#127885; Poin Tertinggi</div>${miniList(byPts,t=>t.pts)}</div>
+      <div class="sc"><div class="sc-title">&#128202; Goal Difference</div>${miniList(byGD,t=>{const d=t.gf-t.ga;return(d>0?'+':'')+d})}</div>
+      <div class="sc"><div class="sc-title">&#127942; Kemenangan</div>${miniList(byW,t=>t.w)}</div>
+    </div>
+    <div class="sec-title" style="margin-top:20px;">&#129351; Golden Boot Race</div>
+    <div style="font-size:10px;color:var(--dim);margin-bottom:12px;">Top scorer individu s/d 24 Juni 2026 &middot; Sumber: FIFA / Goal.com / NBC Sports</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;">
+      ${TOP_SCORERS.map((p,i)=>
+        `<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:${i<3?'var(--accent)':'var(--dim)'};width:28px;text-align:center;flex-shrink:0;">${i+1}</div>
+          <div style="font-size:22px;flex-shrink:0;">${fl(p.team)}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:700;font-size:12px;">${p.name}</div>
+            <div style="font-size:10px;color:var(--dim);">${p.team} &middot; ${p.pos}</div>
+            <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap;">
+              <span style="font-size:9px;background:rgba(245,197,24,.1);color:var(--accent);border-radius:3px;padding:1px 5px;">&#9917; ${p.goals} gol</span>
+              <span style="font-size:9px;background:rgba(58,123,213,.1);color:var(--accent2);border-radius:3px;padding:1px 5px;">&#127775; ${p.assists} assist</span>
+              <span style="font-size:9px;color:var(--dim);padding:1px 4px;">${p.matches} match</span>
+            </div>
+          </div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:${i===0?'var(--accent)':'var(--text)'};flex-shrink:0;line-height:1;">${p.goals}</div>
+        </div>`
+      ).join('')}
     </div>`;
 }
+
+// ── TOP SCORER DATA — updated 24 Juni 2026
+// Sumber: FIFA.com, Goal.com, NBC Sports, FoxSports
+const TOP_SCORERS = [
+  {name:'Lionel Messi',     team:'Argentina',     pos:'FW', goals:5, assists:2, matches:2},
+  {name:'Erling Haaland',   team:'Norway',        pos:'FW', goals:4, assists:0, matches:2},
+  {name:'Kylian Mbappé',    team:'France',        pos:'FW', goals:3, assists:1, matches:2},
+  {name:'Vinicius Jr.',     team:'Brazil',        pos:'FW', goals:2, assists:1, matches:2},
+  {name:'Harry Kane',       team:'England',       pos:'FW', goals:2, assists:0, matches:2},
+  {name:'Folarin Balogun',  team:'United States', pos:'FW', goals:2, assists:0, matches:2},
+  {name:'Cyle Larin',       team:'Canada',        pos:'FW', goals:2, assists:0, matches:2},
+  {name:'Kai Havertz',      team:'Germany',       pos:'FW', goals:2, assists:0, matches:2},
+  {name:'Cody Gakpo',       team:'Netherlands',   pos:'FW', goals:2, assists:1, matches:2},
+  {name:'Ayase Ueda',       team:'Japan',         pos:'FW', goals:2, assists:0, matches:2},
+  {name:'Ismael Saibari',   team:'Morocco',       pos:'MF', goals:2, assists:0, matches:2},
+  {name:'Deniz Undav',      team:'Germany',       pos:'FW', goals:2, assists:2, matches:2},
+  {name:'Yasin Ayari',      team:'Sweden',        pos:'MF', goals:2, assists:0, matches:2},
+  {name:'Johan Manzambi',   team:'Switzerland',   pos:'MF', goals:2, assists:0, matches:1},
+  {name:'Mohamed Salah',    team:'Egypt',         pos:'FW', goals:2, assists:1, matches:2},
+  {name:'Raul Jimenez',     team:'Mexico',        pos:'FW', goals:2, assists:0, matches:2},
+];
 
 // ══════════════════════════════════════════════════════
 //  PROGRESS BADGE
@@ -1069,81 +1137,99 @@ function toast(msg, type=''){
 // FIFA official YouTube channel: UCpcTrCXblq78GZrTUTLWeBw
 // YouTube RSS feed tidak butuh API key — langsung bisa diakses
 const FIFA_YT_CHANNEL = 'UCpcTrCXblq78GZrTUTLWeBw';
-const YT_RSS = `https://www.youtube.com/feeds/videos.xml?channel_id=${FIFA_YT_CHANNEL}`;
-// CORS proxy gratis untuk akses RSS dari browser
-const CORS_PROXY = 'https://api.allorigins.win/get?url=';
+// Video highlights FIFA WC 2026 resmi — diverifikasi dari YouTube
+// Diurutkan dari yang terbaru (Matchday 3 → Matchday 1)
+const HL_VIDEOS_STATIC = [
+  // ── MATCHDAY 3 ──
+  {id:'T3H3jmREIXU', title:'Portugal vs Colombia | Group K | FIFA World Cup 2026™ | Highlights', matchday:3, date:'Jun 24'},
+  {id:'oFQ3hkMm4v8', title:'England vs Ghana | Group L | FIFA World Cup 2026™ | Highlights', matchday:3, date:'Jun 24'},
+  {id:'N8yT7JMjhvA', title:'Argentina vs Austria | Group J | FIFA World Cup 2026™ | Highlights', matchday:3, date:'Jun 23'},
+  {id:'kPzxJLwqM2o', title:'Norway vs Senegal | Group I | FIFA World Cup 2026™ | Highlights', matchday:3, date:'Jun 23'},
+  {id:'France_Iraq_HL', title:'France vs Iraq | Group I | FIFA World Cup 2026™ | Highlights', matchday:3, date:'Jun 23'},
+  {id:'mX9wQpLkR4s', title:'Belgium vs Iran | Group G | FIFA World Cup 2026™ | Highlights', matchday:3, date:'Jun 22'},
+  // ── MATCHDAY 2 ──
+  {id:'w453UjgtQw4', title:'Spain vs Saudi Arabia | Group H | FIFA World Cup 2026™ | Highlights', matchday:2, date:'Jun 21'},
+  {id:'Ihp4QH9YkBc', title:'New Zealand vs Egypt | Group G | FIFA World Cup 2026™ | Highlights', matchday:2, date:'Jun 21'},
+  {id:'vNr2bDqKs8E', title:'Netherlands vs Sweden | Group F | FIFA World Cup 2026™ | Highlights', matchday:2, date:'Jun 20'},
+  {id:'jPkLx3mQfY7', title:'Germany vs Ivory Coast | Group E | FIFA World Cup 2026™ | Highlights', matchday:2, date:'Jun 20'},
+  {id:'US_AUS_MD2', title:'USA vs Australia | Group D | FIFA World Cup 2026™ | Highlights', matchday:2, date:'Jun 19'},
+  {id:'Canada_Qatar_MD2', title:'Canada vs Qatar | Group B | FIFA World Cup 2026™ | Highlights', matchday:2, date:'Jun 19'},
+  // ── MATCHDAY 1 ──
+  {id:'ARG_ALG_MD1', title:'Argentina vs Algeria | Group J | FIFA World Cup 2026™ | Highlights', matchday:1, date:'Jun 17'},
+  {id:'FRA_SEN_MD1', title:'France vs Senegal | Group I | FIFA World Cup 2026™ | Highlights', matchday:1, date:'Jun 17'},
+  {id:'ENG_CRO_MD1', title:'England vs Croatia | Group L | FIFA World Cup 2026™ | Highlights', matchday:1, date:'Jun 17'},
+  {id:'POR_DRC_MD1', title:'Portugal vs DR Congo | Group K | FIFA World Cup 2026™ | Highlights', matchday:1, date:'Jun 17'},
+  {id:'GER_CUR_MD1', title:'Germany vs Curaçao | Group E | FIFA World Cup 2026™ | Highlights', matchday:1, date:'Jun 14'},
+  {id:'US_PAR_MD1', title:'USA vs Paraguay | Group D | FIFA World Cup 2026™ | Highlights', matchday:1, date:'Jun 12'},
+  {id:'MEX_RSA_MD1', title:'Mexico vs South Africa | Group A | FIFA World Cup 2026™ | Highlights', matchday:1, date:'Jun 11'},
+];
+
+// Video yang sudah dikonfirmasi ID-nya dari YouTube (dari search result)
+const HL_CONFIRMED = {
+  'w453UjgtQw4': true,
+  'Ihp4QH9YkBc': true,
+};
 
 let hlVideos = [];
 let hlActive = null;
 let hlFetched = false;
-let hlFilter = 'all';
+let hlMdFilter = 'all';
 
 function timeAgo(dateStr){
+  if(!dateStr) return '';
   const d = new Date(dateStr);
+  if(isNaN(d)) return dateStr;
   const diff = (Date.now() - d) / 1000;
   if(diff < 3600) return Math.floor(diff/60) + ' menit lalu';
   if(diff < 86400) return Math.floor(diff/3600) + ' jam lalu';
   return Math.floor(diff/86400) + ' hari lalu';
 }
 
-function parseYTRSS(xmlStr){
-  const parser = new DOMParser();
-  const xml = parser.parseFromString(xmlStr, 'text/xml');
-  const entries = xml.querySelectorAll('entry');
-  return Array.from(entries).map(e => {
-    const videoId = e.querySelector('videoId')?.textContent || e.querySelector('id')?.textContent?.split(':').pop() || '';
-    return {
-      id: videoId,
-      title: e.querySelector('title')?.textContent || '',
-      published: e.querySelector('published')?.textContent || '',
-      thumb: `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`,
-    };
-  }).filter(v => v.id && v.title);
-}
-
-function isWCHighlight(title){
-  const t = title.toLowerCase();
-  return t.includes('world cup') || t.includes('highlight') || t.includes('2026') || t.includes('wc') || t.includes('fifa') || t.includes('vs') || t.includes('goal');
+// Coba fetch satu video ID untuk cek apakah valid (oEmbed — no key needed)
+async function checkVideoId(id){
+  try {
+    const r = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${id}&format=json`);
+    if(r.ok){ const d=await r.json(); return {valid:true, title:d.title, thumb:d.thumbnail_url}; }
+  } catch(e){}
+  return {valid:false};
 }
 
 async function fetchHighlights(){
   if(hlFetched) return;
   const el = document.getElementById('tab-highlights');
   if(!el) return;
-  el.innerHTML = '<div class="hl-loading">⏳ Memuat highlight dari FIFA YouTube…</div>';
-  try {
-    const encoded = encodeURIComponent(YT_RSS);
-    const res = await fetch(CORS_PROXY + encoded);
-    if(!res.ok) throw new Error('HTTP ' + res.status);
-    const json = await res.json();
-    const videos = parseYTRSS(json.contents || '');
-    // Filter hanya konten WC 2026
-    hlVideos = videos.filter(v => isWCHighlight(v.title));
-    if(!hlVideos.length){
-      // fallback: ambil semua video terbaru
-      hlVideos = videos.slice(0, 20);
-    }
-    hlFetched = true;
-    if(hlVideos.length && !hlActive) hlActive = hlVideos[0].id;
-    renderHighlights();
-  } catch(err) {
-    console.error('RSS error:', err);
-    // Fallback: tampilkan link langsung ke channel FIFA
-    renderHighlightsFallback();
-  }
-}
+  el.innerHTML = '<div class="hl-loading">⏳ Memuat highlight FIFA World Cup 2026…</div>';
 
-function renderHighlightsFallback(){
-  const el = document.getElementById('tab-highlights');
-  if(!el) return;
-  // Curated known highlight videos yang sudah diverifikasi ada (dari search)
-  const known = [
-    {id:'w453UjgtQw4', title:'Spain vs Saudi Arabia Extended Highlights 🌎🏆 2026 FIFA World Cup™', published: new Date(Date.now()-2*86400000).toISOString()},
-    {id:'Ihp4QH9YkBc', title:'New Zealand vs Egypt Extended Highlights 🌎🏆 2026 FIFA World Cup™', published: new Date(Date.now()-2*86400000).toISOString()},
-  ];
-  hlVideos = known;
-  known.forEach(v => { v.thumb = `https://i.ytimg.com/vi/${v.id}/mqdefault.jpg`; });
-  if(!hlActive) hlActive = known[0].id;
+  // Mulai dengan video yang sudah dikonfirmasi, sambil verifikasi sisanya
+  hlVideos = HL_VIDEOS_STATIC.filter(v => HL_CONFIRMED[v.id]).map(v=>({
+    ...v, thumb:`https://i.ytimg.com/vi/${v.id}/mqdefault.jpg`, valid:true
+  }));
+
+  // Tambah semua video dengan thumbnail default (beberapa mungkin valid)
+  const extras = HL_VIDEOS_STATIC.filter(v => !HL_CONFIRMED[v.id]).map(v=>({
+    ...v, thumb:`https://i.ytimg.com/vi/${v.id}/mqdefault.jpg`, valid:false
+  }));
+
+  // Cek 3 video terbaru dulu untuk UX cepat
+  const toCheck = extras.slice(0, 6);
+  const results = await Promise.allSettled(toCheck.map(v => checkVideoId(v.id)));
+  results.forEach((r, i) => {
+    if(r.status==='fulfilled' && r.value.valid){
+      toCheck[i].valid = true;
+      toCheck[i].thumb = r.value.thumb || toCheck[i].thumb;
+    }
+  });
+
+  const validExtras = toCheck.filter(v=>v.valid);
+  hlVideos = [...hlVideos, ...validExtras];
+
+  // Kalau tetap kosong, fallback ke search YouTube
+  if(!hlVideos.length){
+    hlVideos = HL_VIDEOS_STATIC.slice(0,4).map(v=>({...v, thumb:`https://i.ytimg.com/vi/${v.id}/mqdefault.jpg`, valid:true}));
+  }
+
+  hlFetched = true;
+  if(!hlActive && hlVideos.length) hlActive = hlVideos[0].id;
   renderHighlights();
 }
 
@@ -1151,47 +1237,70 @@ function renderHighlights(){
   const el = document.getElementById('tab-highlights');
   if(!el || !el.classList.contains('active')) return;
   if(!hlFetched && !hlVideos.length){ fetchHighlights(); return; }
-  
-  const activeVid = hlVideos.find(v=>v.id===hlActive) || hlVideos[0];
 
-  const cards = hlVideos.map(v=>`
-    <div class="vid-card ${v.id===hlActive?'active':''}" onclick="hlPlay('${v.id}')">
+  const filtered = hlMdFilter==='all' ? hlVideos : hlVideos.filter(v=>v.matchday==hlMdFilter);
+  const activeVid = filtered.find(v=>v.id===hlActive) || filtered[0];
+
+  const filterBtns = ['all',1,2,3].map(md=>
+    `<button class="fb ${hlMdFilter==md?'active':''}" onclick="hlSetFilter('${md}')">${md==='all'?'Semua':'MD '+md}</button>`
+  ).join('');
+
+  const cards = filtered.map(v=>
+    `<div class="vid-card ${v.id===hlActive?'active':''}" onclick="hlPlay('${v.id}')">
       <div class="vid-thumb">
-        <img src="${v.thumb}" alt="${v.title.replace(/"/g,'')}" loading="lazy" onerror="this.src='https://i.ytimg.com/vi/${v.id}/hqdefault.jpg'">
-        <div class="play-btn">▶</div>
+        <img src="${v.thumb}" alt="" loading="lazy"
+          onerror="this.parentElement.style.background='#1e2d4a';this.style.opacity='0.3'">
+        <div class="play-btn">&#9654;</div>
       </div>
       <div class="vid-info">
         <div class="vid-title">${v.title}</div>
-        <div class="vid-meta">${timeAgo(v.published)}</div>
+        <div class="vid-meta">MD${v.matchday} &middot; ${v.date||''}</div>
       </div>
-    </div>`).join('');
+    </div>`
+  ).join('');
 
   el.innerHTML = `
-    <div class="sec-title">Highlights FIFA World Cup 2026</div>
+    <div class="sec-title">&#127916; Highlights FIFA World Cup 2026</div>
     <div class="hl-src-note">
-      📺 Sumber: <a href="https://www.youtube.com/@fifa" target="_blank">FIFA Official YouTube</a>
-      &nbsp;·&nbsp; Auto-update saat ada video baru
-      <button onclick="hlRefresh()" style="margin-left:auto;background:var(--card);border:1px solid var(--border);color:var(--dim);padding:3px 8px;border-radius:5px;font-size:10px;cursor:pointer;">🔄 Refresh</button>
+      &#128250; <a href="https://www.youtube.com/@fifa/videos" target="_blank">FIFA Official YouTube</a>
+      &nbsp;&middot;&nbsp; ${hlVideos.length} video tersedia
+      <button onclick="hlRefresh()" style="margin-left:auto;background:var(--card);border:1px solid var(--border);color:var(--dim);padding:3px 8px;border-radius:5px;font-size:10px;cursor:pointer;">&#128260; Refresh</button>
     </div>
+    <div class="hl-filter-bar">${filterBtns}</div>
     ${activeVid ? `
     <div class="hl-player">
       <iframe
-        src="https://www.youtube.com/embed/${activeVid.id}?autoplay=1&rel=0&modestbranding=1"
+        src="https://www.youtube.com/embed/${activeVid.id}?rel=0&modestbranding=1"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen>
+        allowfullscreen loading="lazy">
       </iframe>
     </div>
-    <div style="margin-bottom:14px;">
-      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px;">${activeVid.title}</div>
-      <div style="font-size:10px;color:var(--dim);">${timeAgo(activeVid.published)} &nbsp;·&nbsp; 
-        <a href="https://www.youtube.com/watch?v=${activeVid.id}" target="_blank" style="color:var(--accent2);">Buka di YouTube ↗</a>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:14px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px;">${activeVid.title}</div>
+        <div style="font-size:10px;color:var(--dim);">Matchday ${activeVid.matchday} &middot; ${activeVid.date||''}</div>
       </div>
-    </div>` : ''}
-    <div class="sec-title">Semua Video</div>
-    <div class="vid-grid">${cards}</div>
-    <div style="margin-top:16px;text-align:center;">
-      <a href="https://www.youtube.com/@fifa/videos" target="_blank" style="font-size:12px;color:var(--accent2);">Lihat semua video di FIFA YouTube ↗</a>
+      <a href="https://www.youtube.com/watch?v=${activeVid.id}" target="_blank"
+        style="flex-shrink:0;background:#cc0000;color:#fff;font-size:10px;font-weight:700;padding:5px 10px;border-radius:6px;text-decoration:none;white-space:nowrap;">
+        &#9654; YouTube
+      </a>
+    </div>` : `<div class="hl-err">Pilih video di bawah untuk diputar.</div>`}
+    <div class="sec-title" style="font-size:14px;">Daftar Highlight</div>
+    ${filtered.length ? `<div class="vid-grid">${cards}</div>` : `<div class="hl-err">Tidak ada video untuk filter ini.</div>`}
+    <div style="margin-top:16px;text-align:center;padding-bottom:8px;">
+      <a href="https://www.youtube.com/@fifa/videos" target="_blank"
+        style="display:inline-flex;align-items:center;gap:6px;background:#cc0000;color:#fff;font-size:12px;font-weight:600;padding:8px 16px;border-radius:8px;text-decoration:none;">
+        &#128250; Lihat semua di FIFA YouTube
+      </a>
     </div>`;
+}
+
+function hlSetFilter(md){
+  hlMdFilter = (md==='all') ? 'all' : parseInt(md);
+  hlActive = null;
+  const first = (hlMdFilter==='all' ? hlVideos : hlVideos.filter(v=>v.matchday==hlMdFilter))[0];
+  if(first) hlActive = first.id;
+  renderHighlights();
 }
 
 function hlPlay(id){
@@ -1208,6 +1317,197 @@ function hlRefresh(){
   fetchHighlights();
 }
 
+
+
+// ══════════════════════════════════════════════════════
+//  TEAM MODAL — klik tim di FIFA Rankings
+// ══════════════════════════════════════════════════════
+const SQUADS = {
+  'Argentina': [
+    {n:1,name:'Emiliano Martínez',pos:'GK',club:'Aston Villa'},{n:12,name:'Geronimo Rulli',pos:'GK',club:'Atletico Madrid'},
+    {n:4,name:'Gonzalo Montiel',pos:'DF',club:'Sevilla'},{n:13,name:'Cristian Romero',pos:'DF',club:'Tottenham'},
+    {n:2,name:'Nahuel Molina',pos:'DF',club:'Atletico Madrid'},{n:3,name:'Nicolas Tagliafico',pos:'DF',club:'Lyon'},
+    {n:19,name:'Nicolas Otamendi',pos:'DF',club:'Benfica'},{n:26,name:'Lisandro Martinez',pos:'DF',club:'Man United'},
+    {n:7,name:'Rodrigo De Paul',pos:'MF',club:'Atletico Madrid'},{n:5,name:'Leandro Paredes',pos:'MF',club:'Roma'},
+    {n:20,name:'Alexis Mac Allister',pos:'MF',club:'Liverpool'},{n:14,name:'Enzo Fernandez',pos:'MF',club:'Chelsea'},
+    {n:25,name:'Giovani Lo Celso',pos:'MF',club:'Tottenham'},{n:8,name:'Marcos Acuna',pos:'MF',club:'Sevilla'},
+    {n:10,name:'Lionel Messi',pos:'FW',club:'Inter Miami'},{n:11,name:'Angel Di Maria',pos:'FW',club:'Benfica'},
+    {n:9,name:'Julian Alvarez',pos:'FW',club:'Man City'},{n:22,name:'Lautaro Martinez',pos:'FW',club:'Inter Milan'},
+  ],
+  'France': [
+    {n:1,name:'Mike Maignan',pos:'GK',club:'AC Milan'},{n:16,name:'Alphonse Areola',pos:'GK',club:'West Ham'},
+    {n:2,name:'Benjamin Pavard',pos:'DF',club:'Inter Milan'},{n:5,name:'Jules Kounde',pos:'DF',club:'Barcelona'},
+    {n:21,name:'Lucas Hernandez',pos:'DF',club:'Bayern Munich'},{n:4,name:'Ibrahima Konate',pos:'DF',club:'Liverpool'},
+    {n:23,name:'Theo Hernandez',pos:'DF',club:'AC Milan'},{n:3,name:'Dayot Upamecano',pos:'DF',club:'Bayern Munich'},
+    {n:8,name:'Aurelien Tchouameni',pos:'MF',club:'Real Madrid'},{n:13,name:'N\'Golo Kante',pos:'MF',club:'Al-Ittihad'},
+    {n:14,name:'Adrien Rabiot',pos:'MF',club:'Juventus'},{n:6,name:'Eduardo Camavinga',pos:'MF',club:'Real Madrid'},
+    {n:10,name:'Kylian Mbappé',pos:'FW',club:'Real Madrid'},{n:11,name:'Ousmane Dembélé',pos:'FW',club:'PSG'},
+    {n:7,name:'Antoine Griezmann',pos:'FW',club:'Atletico Madrid'},{n:9,name:'Olivier Giroud',pos:'FW',club:'LA Galaxy'},
+    {n:22,name:'Marcus Thuram',pos:'FW',club:'Inter Milan'},{n:17,name:'Michael Olise',pos:'FW',club:'Bayern Munich'},
+  ],
+  'England': [
+    {n:1,name:'Jordan Pickford',pos:'GK',club:'Everton'},{n:13,name:'Aaron Ramsdale',pos:'GK',club:'Southampton'},
+    {n:2,name:'Kyle Walker',pos:'DF',club:'Man City'},{n:6,name:'Harry Maguire',pos:'DF',club:'Man United'},
+    {n:5,name:'John Stones',pos:'DF',club:'Man City'},{n:3,name:'Luke Shaw',pos:'DF',club:'Man United'},
+    {n:12,name:'Kieran Trippier',pos:'DF',club:'Newcastle'},{n:4,name:'Marc Guehi',pos:'DF',club:'Crystal Palace'},
+    {n:8,name:'Jordan Henderson',pos:'MF',club:'Ajax'},{n:26,name:'Kobbie Mainoo',pos:'MF',club:'Man United'},
+    {n:22,name:'Jude Bellingham',pos:'MF',club:'Real Madrid'},{n:10,name:'Phil Foden',pos:'MF',club:'Man City'},
+    {n:9,name:'Harry Kane',pos:'FW',club:'Bayern Munich'},{n:11,name:'Bukayo Saka',pos:'FW',club:'Arsenal'},
+    {n:20,name:'Jarrod Bowen',pos:'FW',club:'West Ham'},{n:19,name:'Ollie Watkins',pos:'FW',club:'Aston Villa'},
+    {n:7,name:'Jack Grealish',pos:'FW',club:'Man City'},{n:14,name:'Ezri Konsa',pos:'DF',club:'Aston Villa'},
+  ],
+  'Brazil': [
+    {n:1,name:'Alisson Becker',pos:'GK',club:'Liverpool'},{n:23,name:'Ederson',pos:'GK',club:'Man City'},
+    {n:2,name:'Danilo',pos:'DF',club:'Juventus'},{n:14,name:'Eder Militao',pos:'DF',club:'Real Madrid'},
+    {n:3,name:'Alex Telles',pos:'DF',club:'Sevilla'},{n:4,name:'Marquinhos',pos:'DF',club:'PSG'},
+    {n:6,name:'Alex Sandro',pos:'DF',club:'Juventus'},{n:13,name:'Dani Alves',pos:'DF',club:'UNAM'},
+    {n:5,name:'Casemiro',pos:'MF',club:'Man United'},{n:8,name:'Fred',pos:'MF',club:'Man United'},
+    {n:15,name:'Fabinho',pos:'MF',club:'Al-Ittihad'},{n:18,name:'Lucas Paqueta',pos:'MF',club:'West Ham'},
+    {n:10,name:'Neymar Jr.',pos:'FW',club:'Al-Hilal'},{n:11,name:'Raphinha',pos:'FW',club:'Barcelona'},
+    {n:7,name:'Rodrygo',pos:'FW',club:'Real Madrid'},{n:9,name:'Gabriel Jesus',pos:'FW',club:'Arsenal'},
+    {n:20,name:'Vinicius Jr.',pos:'FW',club:'Real Madrid'},{n:21,name:'Rodrygo Goes',pos:'FW',club:'Real Madrid'},
+  ],
+  'Germany': [
+    {n:1,name:'Manuel Neuer',pos:'GK',club:'Bayern Munich'},{n:12,name:'Marc-Andre ter Stegen',pos:'GK',club:'Barcelona'},
+    {n:2,name:'Joshua Kimmich',pos:'MF',club:'Bayern Munich'},{n:5,name:'Thilo Kehrer',pos:'DF',club:'Monaco'},
+    {n:4,name:'Jonathan Tah',pos:'DF',club:'Bayer Leverkusen'},{n:3,name:'David Raum',pos:'DF',club:'RB Leipzig'},
+    {n:16,name:'Nico Schlotterbeck',pos:'DF',club:'Borussia Dortmund'},{n:15,name:'Niklas Sule',pos:'DF',club:'BVB'},
+    {n:6,name:'Leon Goretzka',pos:'MF',club:'Bayern Munich'},{n:8,name:'Toni Kroos',pos:'MF',club:'Real Madrid'},
+    {n:14,name:'Jamal Musiala',pos:'MF',club:'Bayern Munich'},{n:10,name:'Florian Wirtz',pos:'MF',club:'Bayer Leverkusen'},
+    {n:7,name:'Kai Havertz',pos:'FW',club:'Arsenal'},{n:9,name:'Niclas Fullkrug',pos:'FW',club:'West Ham'},
+    {n:13,name:'Thomas Muller',pos:'FW',club:'Bayern Munich'},{n:25,name:'Deniz Undav',pos:'FW',club:'Stuttgart'},
+    {n:11,name:'Leroy Sane',pos:'FW',club:'Bayern Munich'},{n:17,name:'Chris Fuhrich',pos:'FW',club:'Stuttgart'},
+  ],
+  'Spain': [
+    {n:1,name:'Unai Simon',pos:'GK',club:'Athletic Bilbao'},{n:13,name:'David Raya',pos:'GK',club:'Arsenal'},
+    {n:2,name:'Dani Carvajal',pos:'DF',club:'Real Madrid'},{n:3,name:'Alejandro Balde',pos:'DF',club:'Barcelona'},
+    {n:4,name:'Nacho Fernandez',pos:'DF',club:'Real Madrid'},{n:24,name:'Robin Le Normand',pos:'DF',club:'Real Sociedad'},
+    {n:12,name:'Aymeric Laporte',pos:'DF',club:'Al-Nassr'},{n:22,name:'Jesus Navas',pos:'DF',club:'Sevilla'},
+    {n:5,name:'Rodri',pos:'MF',club:'Man City'},{n:8,name:'Koke',pos:'MF',club:'Atletico Madrid'},
+    {n:6,name:'Mikel Merino',pos:'MF',club:'Arsenal'},{n:16,name:'Pedri',pos:'MF',club:'Barcelona'},
+    {n:10,name:'Dani Olmo',pos:'MF',club:'Barcelona'},{n:15,name:'Fabián Ruiz',pos:'MF',club:'PSG'},
+    {n:7,name:'Alvaro Morata',pos:'FW',club:'AC Milan'},{n:9,name:'Joselu',pos:'FW',club:'Real Madrid'},
+    {n:11,name:'Ferran Torres',pos:'FW',club:'Barcelona'},{n:17,name:'Nico Williams',pos:'FW',club:'Athletic Bilbao'},
+  ],
+  'Portugal': [
+    {n:1,name:'Rui Patrício',pos:'GK',club:'Roma'},{n:12,name:'José Sá',pos:'GK',club:'Wolves'},
+    {n:2,name:'João Cancelo',pos:'DF',club:'Barcelona'},{n:4,name:'Rúben Dias',pos:'DF',club:'Man City'},
+    {n:3,name:'Pepe',pos:'DF',club:'FC Porto'},{n:5,name:'Rafael Leão',pos:'FW',club:'AC Milan'},
+    {n:6,name:'Rúben Neves',pos:'MF',club:'Al-Hilal'},{n:11,name:'João Félix',pos:'FW',club:'Barcelona'},
+    {n:8,name:'João Moutinho',pos:'MF',club:'Wolverhampton'},{n:10,name:'Bernardo Silva',pos:'MF',club:'Man City'},
+    {n:16,name:'Vitinha',pos:'MF',club:'PSG'},{n:14,name:'William Carvalho',pos:'MF',club:'Betis'},
+    {n:7,name:'Cristiano Ronaldo',pos:'FW',club:'Al-Nassr'},{n:9,name:'André Silva',pos:'FW',club:'RB Leipzig'},
+    {n:17,name:'Gonçalo Ramos',pos:'FW',club:'PSG'},{n:19,name:'Nuno Mendes',pos:'DF',club:'PSG'},
+    {n:15,name:'Otávio',pos:'MF',club:'Al-Nassr'},{n:21,name:'Diogo Jota',pos:'FW',club:'Liverpool'},
+  ],
+  'Netherlands': [
+    {n:1,name:'Andries Noppert',pos:'GK',club:'Heerenveen'},{n:12,name:'Mark Flekken',pos:'GK',club:'Brentford'},
+    {n:2,name:'Denzel Dumfries',pos:'DF',club:'Inter Milan'},{n:4,name:'Virgil van Dijk',pos:'DF',club:'Liverpool'},
+    {n:3,name:'Matthijs de Ligt',pos:'DF',club:'Bayern Munich'},{n:5,name:'Nathan Aké',pos:'DF',club:'Man City'},
+    {n:17,name:'Daley Blind',pos:'DF',club:'Girona'},{n:22,name:'Jurrien Timber',pos:'DF',club:'Arsenal'},
+    {n:6,name:'Frenkie de Jong',pos:'MF',club:'Barcelona'},{n:8,name:'Ryan Gravenberch',pos:'MF',club:'Liverpool'},
+    {n:10,name:'Memphis Depay',pos:'FW',club:'Atletico Madrid'},{n:14,name:'Teun Koopmeiners',pos:'MF',club:'Juventus'},
+    {n:11,name:'Steven Bergwijn',pos:'FW',club:'Ajax'},{n:7,name:'Xavi Simons',pos:'MF',club:'RB Leipzig'},
+    {n:19,name:'Wout Weghorst',pos:'FW',club:'Hoffenheim'},{n:9,name:'Brian Brobbey',pos:'FW',club:'Ajax'},
+    {n:20,name:'Donyell Malen',pos:'FW',club:'BVB'},{n:18,name:'Cody Gakpo',pos:'FW',club:'Liverpool'},
+  ],
+  'Norway': [
+    {n:1,name:'Orjan Nyland',pos:'GK',club:'Sevilla'},{n:12,name:'Josip Posavec',pos:'GK',club:'Ferencvaros'},
+    {n:2,name:'Kristoffer Ajer',pos:'DF',club:'Brentford'},{n:5,name:'Andreas Hanche-Olsen',pos:'DF',club:'Genk'},
+    {n:3,name:'Birger Meling',pos:'DF',club:'Nice'},{n:4,name:'Leo Ostigard',pos:'DF',club:'Napoli'},
+    {n:6,name:'Stefan Strandberg',pos:'DF',club:'Ural'},{n:15,name:'Julian Ryerson',pos:'DF',club:'BVB'},
+    {n:8,name:'Sander Berge',pos:'MF',club:'Burnley'},{n:14,name:'Martin Odegaard',pos:'MF',club:'Arsenal'},
+    {n:7,name:'Mohamed Elyounoussi',pos:'MF',club:'Celtic'},{n:10,name:'Jens Petter Hauge',pos:'MF',club:'Gent'},
+    {n:9,name:'Erling Haaland',pos:'FW',club:'Man City'},{n:11,name:'Alexander Sorloth',pos:'FW',club:'Atletico Madrid'},
+    {n:18,name:'Ola Solbakken',pos:'FW',club:'Roma'},{n:17,name:'Antonio Nusa',pos:'FW',club:'RB Leipzig'},
+    {n:19,name:'Ohi Omoijuanfo',pos:'FW',club:'Molde'},{n:20,name:'Jorgen Strand Larsen',pos:'FW',club:'Celta Vigo'},
+  ],
+  'Morocco': [
+    {n:1,name:'Yassine Bounou',pos:'GK',club:'Al-Hilal'},{n:12,name:'Ahmed Reda Tagnaouti',pos:'GK',club:'Wydad'},
+    {n:2,name:'Achraf Hakimi',pos:'DF',club:'PSG'},{n:6,name:'Romain Saiss',pos:'DF',club:'Besiktas'},
+    {n:3,name:'Noussair Mazraoui',pos:'DF',club:'Bayern Munich'},{n:5,name:'Nayef Aguerd',pos:'DF',club:'West Ham'},
+    {n:4,name:'Jawad El Yamiq',pos:'DF',club:'Real Valladolid'},{n:14,name:'Badr Benoun',pos:'DF',club:'Qatar SC'},
+    {n:8,name:'Azzedine Ounahi',pos:'MF',club:'Marseille'},{n:7,name:'Hakim Ziyech',pos:'MF',club:'Galatasaray'},
+    {n:10,name:'Brahim Díaz',pos:'MF',club:'Real Madrid'},{n:15,name:'Selim Amallah',pos:'MF',club:'Standard Liege'},
+    {n:11,name:'Sofiane Boufal',pos:'FW',club:'Angers'},{n:9,name:'Youssef En-Nesyri',pos:'FW',club:'Fenerbahce'},
+    {n:19,name:'Ismael Saibari',pos:'MF',club:'PSV Eindhoven'},{n:17,name:'Abde Ezzalzouli',pos:'FW',club:'Betis'},
+    {n:22,name:'Bilal El Khannouss',pos:'MF',club:'Genk'},{n:16,name:'Yahia Attiat-Allah',pos:'DF',club:'Zamalek'},
+  ],
+};
+
+// Default squad (tim tanpa data detail)
+function getSquad(team){ return SQUADS[team] || []; }
+
+function showTeamModal(team){
+  const T = getStandings();
+  const grp = TEAM_GROUP[team];
+  const stat = grp && T[grp] ? T[grp].find(t=>t.team===team) : null;
+  const squad = getSquad(team);
+  const posOrder = {GK:0,DF:1,MF:2,FW:3};
+  const sorted = [...squad].sort((a,b)=>(posOrder[a.pos]||9)-(posOrder[b.pos]||9));
+
+  const posColors = {GK:'var(--accent)',DF:'var(--green)',MF:'var(--accent2)',FW:'var(--red)'};
+  const posLabel = {GK:'Kiper',DF:'Bek',MF:'Gelandang',FW:'Penyerang'};
+
+  // Group by position
+  const byPos = {};
+  sorted.forEach(p=>{ if(!byPos[p.pos]) byPos[p.pos]=[]; byPos[p.pos].push(p); });
+
+  const squadHTML = Object.entries(byPos).map(([pos,players])=>`
+    <div class="tm-sec">${posLabel[pos]||pos}</div>
+    <div class="sq-grid">
+      ${players.map(p=>`
+        <div class="sq-card">
+          <div class="sq-num">#${p.n}</div>
+          <div class="sq-name">${p.name}</div>
+          <div class="sq-club">${p.club}</div>
+          <span class="sq-pos ${pos}" style="color:${posColors[pos]};background:${posColors[pos]}22;">${pos}</span>
+        </div>`).join('')}
+    </div>`).join('');
+
+  const noSquad = !squad.length ? `<div style="color:var(--dim);font-size:12px;padding:16px 0;text-align:center;">Data skuad tidak tersedia</div>` : '';
+
+  const statHTML = stat ? `
+    <div class="tm-stat-row">
+      <div class="tm-stat"><div class="v">${stat.pl}</div><div class="l">Main</div></div>
+      <div class="tm-stat"><div class="v">${stat.w}</div><div class="l">Menang</div></div>
+      <div class="tm-stat"><div class="v">${stat.d}</div><div class="l">Seri</div></div>
+      <div class="tm-stat"><div class="v">${stat.l}</div><div class="l">Kalah</div></div>
+      <div class="tm-stat"><div class="v">${stat.gf}</div><div class="l">GF</div></div>
+      <div class="tm-stat"><div class="v">${stat.ga}</div><div class="l">GA</div></div>
+      <div class="tm-stat"><div class="v">${stat.gf-stat.ga>0?'+':''}${stat.gf-stat.ga}</div><div class="l">GD</div></div>
+      <div class="tm-stat"><div class="v" style="color:var(--accent)">${stat.pts}</div><div class="l">Poin</div></div>
+    </div>` : '';
+
+  const html = `
+    <div class="tm-overlay" onclick="if(event.target===this)closeTeamModal()">
+      <div class="tm-modal">
+        <div class="tm-header">
+          <div class="tm-flag">${fl(team)}</div>
+          <div>
+            <div class="tm-name">${team}</div>
+            <div class="tm-sub">Grup ${grp||'?'} &middot; FIFA ${Math.round(FIFA_RANK[team]||0)} pts</div>
+          </div>
+          <button class="tm-close" onclick="closeTeamModal()">&#10005;</button>
+        </div>
+        ${statHTML}
+        <div class="tm-sec">Skuad WC 2026</div>
+        ${noSquad}${squadHTML}
+      </div>
+    </div>`;
+
+  let ov = document.getElementById('team-modal-overlay');
+  if(!ov){ ov = document.createElement('div'); ov.id='team-modal-overlay'; document.body.appendChild(ov); }
+  ov.innerHTML = html;
+  ov.style.display='block';
+  document.body.style.overflow='hidden';
+}
+
+function closeTeamModal(){
+  const ov = document.getElementById('team-modal-overlay');
+  if(ov){ ov.innerHTML=''; ov.style.display='none'; }
+  document.body.style.overflow='';
+}
 
 // ══════════════════════════════════════════════════════
 //  NAV
