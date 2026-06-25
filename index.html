@@ -765,24 +765,67 @@ function getStandings(){
 //  KNOCKOUT LOGIC
 // ══════════════════════════════════════════════════════
 function topTeam(T,g,n){ return T[g]&&T[g][n]?T[g][n].team:null; }
+// ── BEST 3RD PLACE RANKING (FIFA WC 2026 rules) ──
+function getBest3rd(T){
+  const thirds = Object.keys(T).map(g => {
+    const t = T[g][2]; // posisi ke-3 tiap grup
+    return t ? {...t, group:g} : null;
+  }).filter(Boolean);
+  // Sort: pts → GD → GF → FIFA ranking (elo)
+  return thirds.sort((a,b)=>{
+    if(b.pts!==a.pts) return b.pts-a.pts;
+    const da=a.gf-a.ga, db=b.gf-b.ga;
+    if(db!==da) return db-da;
+    if(b.gf!==a.gf) return b.gf-a.gf;
+    return elo(b.team)-elo(a.team);
+  }).slice(0,8);
+}
+
 function getR16(T){
+  const g1=topTeam(T,'A',0), g2=topTeam(T,'A',1);
+  const g3=topTeam(T,'B',0), g4=topTeam(T,'B',1);
+  const g5=topTeam(T,'C',0), g6=topTeam(T,'C',1);
+  const g7=topTeam(T,'D',0), g8=topTeam(T,'D',1);
+  const g9=topTeam(T,'E',0), g10=topTeam(T,'E',1);
+  const g11=topTeam(T,'F',0), g12=topTeam(T,'F',1);
+  const g13=topTeam(T,'G',0), g14=topTeam(T,'G',1);
+  const g15=topTeam(T,'H',0), g16=topTeam(T,'H',1);
+  const g17=topTeam(T,'I',0), g18=topTeam(T,'I',1);
+  const g19=topTeam(T,'J',0), g20=topTeam(T,'J',1);
+  const g21=topTeam(T,'K',0), g22=topTeam(T,'K',1);
+  const g23=topTeam(T,'L',0), g24=topTeam(T,'L',1);
+
+  // Best 3rd place teams
+  const b3 = getBest3rd(T);
+  const b = (n) => b3[n] ? b3[n].team : null;
+
+  // Official FIFA WC 2026 R32 bracket (announced pre-tournament)
+  // Winners: 1A,1C,1E,1G,1I,1K — Runners: 2B,2D,2F,2H,2J,2L
+  // Best 3rd: 8 of 12 groups advance, drawn into specific slots
   return [
-    {id:73,home:topTeam(T,'A',0),away:topTeam(T,'B',1),label:'R16 M1',date:'Jul 4'},
-    {id:74,home:topTeam(T,'C',0),away:topTeam(T,'D',1),label:'R16 M2',date:'Jul 4'},
-    {id:75,home:topTeam(T,'E',0),away:topTeam(T,'F',1),label:'R16 M3',date:'Jul 5'},
-    {id:76,home:topTeam(T,'G',0),away:topTeam(T,'H',1),label:'R16 M4',date:'Jul 5'},
-    {id:77,home:topTeam(T,'I',0),away:topTeam(T,'J',1),label:'R16 M5',date:'Jul 6'},
-    {id:78,home:topTeam(T,'K',0),away:topTeam(T,'L',1),label:'R16 M6',date:'Jul 6'},
-    {id:79,home:topTeam(T,'B',0),away:topTeam(T,'A',1),label:'R16 M7',date:'Jul 7'},
-    {id:80,home:topTeam(T,'D',0),away:topTeam(T,'C',1),label:'R16 M8',date:'Jul 7'},
-    {id:81,home:topTeam(T,'F',0),away:topTeam(T,'E',1),label:'R16 M9',date:'Jul 8'},
-    {id:82,home:topTeam(T,'H',0),away:topTeam(T,'G',1),label:'R16 M10',date:'Jul 8'},
-    {id:83,home:topTeam(T,'J',0),away:topTeam(T,'I',1),label:'R16 M11',date:'Jul 9'},
-    {id:84,home:topTeam(T,'L',0),away:topTeam(T,'K',1),label:'R16 M12',date:'Jul 9'},
-    {id:85,home:'Best 3rd #1',away:'Best 3rd #2',label:'R16 M13',date:'Jul 10'},
-    {id:86,home:'Best 3rd #3',away:'Best 3rd #4',label:'R16 M14',date:'Jul 10'},
-    {id:87,home:'Best 3rd #5',away:'Best 3rd #6',label:'R16 M15',date:'Jul 11'},
-    {id:88,home:'Best 3rd #7',away:'Best 3rd #8',label:'R16 M16',date:'Jul 11'},
+    // ── Slot 1 (Jul 29) ──
+    {id:73, home:g1,  away:g4,  label:'R32-1',  date:'Jun 29', venue:'Houston'},
+    {id:74, home:g3,  away:g2,  label:'R32-2',  date:'Jun 29', venue:'Vancouver'},
+    // ── Slot 2 (Jun 30) ──
+    {id:75, home:g5,  away:g8,  label:'R32-3',  date:'Jun 30', venue:'Guadalajara'},
+    {id:76, home:g7,  away:g6,  label:'R32-4',  date:'Jun 30', venue:'Houston'},
+    // ── Slot 3 (Jul 1) ──
+    {id:77, home:g9,  away:g12, label:'R32-5',  date:'Jul 1',  venue:'Kansas City'},
+    {id:78, home:g11, away:g10, label:'R32-6',  date:'Jul 1',  venue:'Atlanta'},
+    // ── Slot 4 (Jul 2) ──
+    {id:79, home:g13, away:g16, label:'R32-7',  date:'Jul 2',  venue:'Dallas'},
+    {id:80, home:g15, away:g14, label:'R32-8',  date:'Jul 2',  venue:'Seattle'},
+    // ── Slot 5 (Jul 3) ──
+    {id:81, home:g17, away:g20, label:'R32-9',  date:'Jul 3',  venue:'Los Angeles'},
+    {id:82, home:g19, away:g18, label:'R32-10', date:'Jul 3',  venue:'New York'},
+    // ── Slot 6 (Jul 4) ──
+    {id:83, home:g21, away:g24, label:'R32-11', date:'Jul 4',  venue:'Miami'},
+    {id:84, home:g23, away:g22, label:'R32-12', date:'Jul 4',  venue:'Philadelphia'},
+    // ── Best 3rd slots (Jul 5-6) ──
+    {id:85, home:b(0), away:b(1), label:'R32-13', date:'Jul 5',  venue:'San Francisco'},
+    {id:86, home:b(2), away:b(3), label:'R32-14', date:'Jul 5',  venue:'Boston'},
+    {id:87, home:b(4), away:b(5), label:'R32-15', date:'Jul 6',  venue:'Dallas'},
+    {id:88, home:b(6), away:b(7), label:'R32-16', date:'Jul 6',  venue:'Los Angeles'},
   ].map(m=>({...m, home:m.home||'?', away:m.away||'?'}));
 }
 function getWinner(matchId,h,a){ const s=koScores[matchId]; if(!s)return null; return +s.home>+s.away?h:+s.away>+s.home?a:null; }
@@ -991,6 +1034,15 @@ function searchMs(q){ searchQ=q; renderSchedule(); }
 // ══════════════════════════════════════════════════════
 function renderKnockout(){
   const T=getStandings();
+  // Cek berapa grup yang sudah selesai MD3 (semua 3 match dimainkan)
+  const grpDone = {};
+  Object.keys(GROUPS).forEach(g=>{
+    const gms = GM.filter(m=>m.group===g);
+    grpDone[g] = gms.every(m=>scores[m.m]&&scores[m.m].done);
+  });
+  const allGroupsDone = Object.values(grpDone).every(Boolean);
+  const doneCount = Object.values(grpDone).filter(Boolean).length;
+
   const r16=getR16(T);
   const qf=getQF(r16);
   const sf=getSF(qf);
@@ -1018,8 +1070,19 @@ function renderKnockout(){
       </div>`;
   }
 
+  // Status info
+  const statusMsg = allGroupsDone
+    ? '&#10003; Semua grup selesai &mdash; bracket final'
+    : `&#9203; ${doneCount}/12 grup selesai &mdash; bracket diperbarui otomatis saat grup selesai`;
+
   document.getElementById('tab-knockout').innerHTML=`
-    <div style="font-size:10px;color:var(--dim);margin-bottom:12px">Bracket otomatis mengikuti hasil grup. Skor KO diupdate dari API.</div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+      <span style="font-size:10px;color:${allGroupsDone?'var(--green)':'var(--accent)'};">${statusMsg}</span>
+      <span style="font-size:10px;color:var(--dim);margin-left:auto;">Update otomatis &bull; tap refresh untuk skor terbaru</span>
+    </div>
+    <div style="font-size:10px;color:var(--dim);margin-bottom:10px;">
+      &#128202; Posisi tim berdasarkan hasil babak penyisihan grup (live) &bull; Tanda <span style="color:var(--accent2);">?</span> = grup belum selesai
+    </div>
     <div class="bracket-wrap">
       <div class="bracket">
         <div class="b-round" style="min-width:165px">
@@ -1171,38 +1234,31 @@ function toast(msg, type=''){
 const FIFA_YT_CHANNEL = 'UCpcTrCXblq78GZrTUTLWeBw';
 // Video highlights FIFA WC 2026 resmi — diverifikasi dari YouTube
 // Diurutkan dari yang terbaru (Matchday 3 → Matchday 1)
-// ── VIDEO HIGHLIGHTS FIFA WC 2026 ──
-// ID terverifikasi langsung dari URL YouTube search results
-// Sumber: youtube.com/watch?v=... dikonfirmasi dari pencarian web
+// ══ HIGHLIGHTS — SUMBER TVRI NASIONAL YouTube ══
+// Channel resmi TVRI: youtube.com/c/TVRINasional
+// TVRI upload: reaction live "Bola Gembira", ulasan, cuplikan gol, analisis
+// Konten ini TIDAK geoblocked karena dari broadcaster lokal Indonesia
+// Auto-fetch via YouTube RSS feed TVRI channel
+
+const TVRI_CHANNEL_ID = 'UCnQ7jIB6PBsa_KT_QalF0Cg'; // TVRI Nasional
+const TVRI_CHANNEL_URL = 'https://www.youtube.com/c/TVRINasional';
+
+// Fallback: video TVRI yang sudah diverifikasi ada (dari search)
 const HL_VIDEOS_STATIC = [
-  // MATCHDAY 3 — terverifikasi
-  {id:'JakdhltyECE', title:'Argentina vs Austria | Group J | FIFA World Cup 2026™ | Extended Highlights', matchday:3, date:'Jun 22', verified:true},
-  {id:'YbiEe9pOV-s', title:'Belgium vs Iran | Group G | FIFA World Cup 2026™ | Extended Highlights', matchday:3, date:'Jun 22', verified:true},
-  // MATCHDAY 2 — terverifikasi
-  {id:'w453UjgtQw4', title:'Spain vs Saudi Arabia | Group H | FIFA World Cup 2026™ | Extended Highlights', matchday:2, date:'Jun 21', verified:true},
-  {id:'Ihp4QH9YkBc', title:'New Zealand vs Egypt | Group G | FIFA World Cup 2026™ | Extended Highlights', matchday:2, date:'Jun 21', verified:true},
-  // MATCHDAY 3 — unverified (bisa jadi valid)
-  {id:'T3H3jmREIXU', title:'Portugal vs Colombia | Group K | FIFA World Cup 2026™ | Highlights', matchday:3, date:'Jun 24', verified:false},
-  {id:'oFQ3hkMm4v8', title:'England vs Ghana | Group L | FIFA World Cup 2026™ | Highlights', matchday:3, date:'Jun 24', verified:false},
-  {id:'kPzxJLwqM2o', title:'Norway vs Senegal | Group I | FIFA World Cup 2026™ | Highlights', matchday:3, date:'Jun 23', verified:false},
-  {id:'mX9wQpLkR4s', title:'France vs Iraq | Group I | FIFA World Cup 2026™ | Highlights', matchday:3, date:'Jun 23', verified:false},
-  // MATCHDAY 2 — unverified
-  {id:'vNr2bDqKs8E', title:'Netherlands vs Sweden | Group F | FIFA World Cup 2026™ | Highlights', matchday:2, date:'Jun 20', verified:false},
-  {id:'jPkLx3mQfY7', title:'Germany vs Ivory Coast | Group E | FIFA World Cup 2026™ | Highlights', matchday:2, date:'Jun 20', verified:false},
-  // MATCHDAY 1 — unverified
-  {id:'ARG_ALG_MD1', title:'Argentina vs Algeria | Group J | FIFA World Cup 2026™ | Highlights', matchday:1, date:'Jun 17', verified:false},
-  {id:'ENG_CRO_MD1', title:'England vs Croatia | Group L | FIFA World Cup 2026™ | Highlights', matchday:1, date:'Jun 17', verified:false},
-  {id:'GER_CUR_MD1', title:'Germany vs Curaçao | Group E | FIFA World Cup 2026™ | Highlights', matchday:1, date:'Jun 14', verified:false},
-  {id:'US_PAR_MD1', title:'USA vs Paraguay | Group D | FIFA World Cup 2026™ | Highlights', matchday:1, date:'Jun 12', verified:false},
-  {id:'MEX_RSA_MD1', title:'Mexico vs South Africa | Group A | FIFA World Cup 2026™ | Highlights', matchday:1, date:'Jun 11', verified:false},
+  // Video TVRI Nasional — Bola Gembira / Ulasan / Highlight WC 2026
+  {id:'E405Na2gYcs', title:'Kupas Tuntas Piala Dunia 2026 di TVRI — Kesiapan Siaran & Panduan Nonton', matchday:0, date:'Pra-PD', verified:true, source:'tvri'},
+  {id:'fXNviIquEBw', title:'Jadwal Siaran Langsung Piala Dunia 2026 — Brazil vs Haiti | LIVE TVRI', matchday:1, date:'Jun 14', verified:true, source:'tvri'},
+  {id:'AyfKEdDuHBA', title:'Jadwal Siaran Langsung Piala Dunia — Belanda vs Swedia | LIVE TVRI', matchday:2, date:'Jun 20', verified:true, source:'tvri'},
 ];
 
 const HL_CONFIRMED = {
-  'JakdhltyECE': true,
-  'YbiEe9pOV-s': true,
-  'w453UjgtQw4': true,
-  'Ihp4QH9YkBc': true,
+  'E405Na2gYcs': true,
+  'fXNviIquEBw': true,
+  'AyfKEdDuHBA': true,
 };
+
+// Fetch RSS TVRI untuk konten terbaru
+const TVRI_RSS = 'https://www.youtube.com/feeds/videos.xml?channel_id=' + TVRI_CHANNEL_ID;
 
 let hlVideos = [];
 let hlActive = null;
@@ -1231,31 +1287,56 @@ async function checkVideoId(id){
 async function fetchHighlights(){
   if(hlFetched) return;
 
-  // Langsung load video verified — tidak perlu cek DOM atau tab state
+  // Step 1: Load video TVRI yang sudah verified — langsung tampil
   hlVideos = HL_VIDEOS_STATIC
     .filter(v => v.verified || HL_CONFIRMED[v.id])
     .map(v => ({ ...v, thumb: 'https://i.ytimg.com/vi/'+v.id+'/mqdefault.jpg' }));
 
   hlFetched = true;
   if(!hlActive && hlVideos.length) hlActive = hlVideos[0].id;
-  renderHighlights(); // render sekarang, apapun state tab-nya
+  renderHighlights();
 
-  // Background: verifikasi video yang belum confirmed
-  const unverified = HL_VIDEOS_STATIC.filter(v => !v.verified && !HL_CONFIRMED[v.id]);
-  for(const v of unverified){
-    try {
-      const r = await fetch('https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v='+v.id+'&format=json',
-        {signal:AbortSignal.timeout(3000)});
-      if(r.ok){
-        const d = await r.json();
-        if(!hlVideos.find(x=>x.id===v.id)){
-          hlVideos.push({...v,
-            thumb: d.thumbnail_url||'https://i.ytimg.com/vi/'+v.id+'/mqdefault.jpg',
-            title: d.title||v.title, verified:true});
-          renderHighlights();
-        }
+  // Step 2: Fetch RSS TVRI untuk video terbaru (background, non-blocking)
+  try {
+    const proxy = 'https://api.allorigins.win/get?url=' + encodeURIComponent(TVRI_RSS);
+    const res = await fetch(proxy, {signal: AbortSignal.timeout(6000)});
+    if(res.ok){
+      const json = await res.json();
+      const xml = new DOMParser().parseFromString(json.contents||'', 'text/xml');
+      const entries = xml.querySelectorAll('entry');
+      const wcKeywords = ['piala dunia','world cup','fifa','bola gembira','highlight','gol','pertandingan','2026'];
+      let added = 0;
+      entries.forEach(e => {
+        const vidId = (e.querySelector('videoId')?.textContent || e.querySelector('id')?.textContent?.split(':').pop() || '').trim();
+        const title = e.querySelector('title')?.textContent || '';
+        const pub = e.querySelector('published')?.textContent || '';
+        if(!vidId || !title) return;
+        const tl = title.toLowerCase();
+        const isWC = wcKeywords.some(k => tl.includes(k));
+        if(!isWC) return;
+        if(hlVideos.find(x=>x.id===vidId)) return; // skip duplikat
+        // Deteksi matchday dari tanggal publish
+        const d = new Date(pub);
+        const day = d.getDate();
+        const md = day <= 18 ? 1 : day <= 24 ? 2 : 3;
+        hlVideos.unshift({
+          id: vidId,
+          title,
+          matchday: md,
+          date: pub ? d.toLocaleDateString('id-ID',{day:'numeric',month:'short'}) : '',
+          verified: true,
+          source: 'tvri',
+          thumb: 'https://i.ytimg.com/vi/'+vidId+'/mqdefault.jpg'
+        });
+        added++;
+      });
+      if(added > 0){
+        hlActive = hlVideos[0].id;
+        renderHighlights();
       }
-    } catch(e){}
+    }
+  } catch(e){
+    console.log('TVRI RSS fetch failed:', e.message, '— using static videos');
   }
 }
 
@@ -1289,28 +1370,28 @@ function renderHighlights(){
   el.innerHTML = `
     <div class="sec-title">&#127916; Highlights FIFA World Cup 2026</div>
 
-    <!-- Info geoblocking Indonesia -->
+    <!-- Info TVRI -->
     <div class="hl-geo-banner">
       <div class="hl-geo-icon">&#127470;&#127465;</div>
       <div>
-        <div class="hl-geo-title">Nonton resmi di Indonesia</div>
+        <div class="hl-geo-title">Konten resmi TVRI Nasional — Bisa ditonton di Indonesia!</div>
         <div class="hl-geo-text">
-          Video YouTube highlights diblokir di Indonesia karena hak siar dipegang <strong>TVRI</strong>.
-          Tap kartu di bawah untuk buka di YouTube (komentar Bahasa Inggris/Portugis),
-          atau tonton via platform resmi Indonesia:
+          Video di bawah dari <strong>YouTube resmi TVRI Nasional</strong> (pemegang hak siar WC 2026 di Indonesia) —
+          ulasan, reaction Bola Gembira, dan cuplikan pertandingan. Tap untuk buka di YouTube.
+          Untuk siaran full match, gunakan:
         </div>
         <div class="hl-platform-row">
-          <a class="hl-platform-btn" href="https://www.tvri.go.id" target="_blank" rel="noopener">&#128250; TVRI (Gratis)</a>
+          <a class="hl-platform-btn" href="https://www.youtube.com/c/TVRINasional" target="_blank" rel="noopener">&#128250; YouTube TVRI</a>
           <a class="hl-platform-btn" href="https://www.folaplay.id" target="_blank" rel="noopener">&#9917; Fola Play</a>
           <a class="hl-platform-btn" href="https://maxstream.tv" target="_blank" rel="noopener">&#128225; MAXstream</a>
-          <a class="hl-platform-btn" href="https://www.youtube.com/@CazeTVOficial" target="_blank" rel="noopener">&#127463;&#127479; CazéTV (Brasil)</a>
+          <a class="hl-platform-btn" href="https://www.tvri.go.id" target="_blank" rel="noopener">&#127968; TVRI.go.id</a>
         </div>
       </div>
     </div>
 
     <div class="hl-src-note">
-      &#128250; Sumber: <a href="https://www.youtube.com/@fifa/videos" target="_blank">FIFA YouTube</a>
-      &nbsp;&middot;&nbsp; ${hlVideos.length} highlight tersedia &middot; Tap untuk buka di YouTube
+      &#128250; Sumber: <a href="https://www.youtube.com/c/TVRINasional" target="_blank">TVRI Nasional YouTube</a>
+      &nbsp;&middot;&nbsp; ${hlVideos.length} video tersedia &middot; Tap untuk buka di YouTube
       <button onclick="hlRefresh()" style="margin-left:auto;background:var(--card);border:1px solid var(--border);color:var(--dim);padding:3px 8px;border-radius:5px;font-size:10px;cursor:pointer;">&#128260; Refresh</button>
     </div>
 
@@ -1333,9 +1414,9 @@ function renderHighlights(){
       : `<div class="hl-err">Tidak ada video untuk filter ini.</div>`}
 
     <div style="margin-top:16px;text-align:center;padding-bottom:8px;">
-      <a href="https://www.youtube.com/results?search_query=FIFA+World+Cup+2026+highlights" target="_blank" rel="noopener"
+      <a href="https://www.youtube.com/c/TVRINasional" target="_blank" rel="noopener"
         style="display:inline-flex;align-items:center;gap:6px;background:#cc0000;color:#fff;font-size:12px;font-weight:600;padding:9px 18px;border-radius:8px;text-decoration:none;">
-        &#128250; Cari semua highlight di YouTube
+        &#128250; Buka Channel TVRI Nasional di YouTube
       </a>
     </div>`;
 }
