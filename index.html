@@ -299,7 +299,7 @@ main{max-width:1400px;margin:0 auto;padding:14px 12px 80px;}
     <div class="status-bar">
       <div class="sync-dot" id="sync-dot"></div>
       <span class="sync-label" id="sync-label">Menghubungkan…</span>
-      <div class="progress-badge" id="progress-badge">48/72</div>
+      <div class="progress-badge" id="progress-badge">58/72</div>
     </div>
   </div>
 </header>
@@ -559,7 +559,23 @@ let scores = {
   46:{home:0,away:1,done:true,live:false}, // Panama 0-1 Croatia
   47:{home:5,away:0,done:true,live:false}, // Portugal 5-0 Uzbekistan
   48:{home:3,away:1,done:true,live:false}, // Colombia 3-1 DR Congo
-}; // group stage scores
+  // ── MATCHDAY 3 ── (sudah selesai per 25 Juni 2026)
+  // Grup C — 24 Jun
+  49:{home:1,away:1,done:true,live:false}, // Scotland 1-1 Brazil
+  50:{home:2,away:0,done:true,live:false}, // Morocco 2-0 Haiti
+  // Grup B — 25 Jun
+  51:{home:1,away:0,done:true,live:false}, // Switzerland 1-0 Canada
+  52:{home:2,away:1,done:true,live:false}, // Bosnia and Herzegovina 2-1 Qatar
+  // Grup A — 25 Jun
+  53:{home:1,away:2,done:true,live:false}, // Czech Republic 1-2 Mexico
+  54:{home:0,away:0,done:true,live:false}, // South Africa 0-0 Korea Republic
+  // Grup E — 25 Jun
+  55:{home:0,away:2,done:true,live:false}, // Curaçao 0-2 Ivory Coast
+  56:{home:0,away:2,done:true,live:false}, // Ecuador 0-2 Germany
+  // Grup F — 25 Jun
+  57:{home:2,away:1,done:true,live:false}, // Japan 2-1 Sweden
+  58:{home:0,away:3,done:true,live:false}, // Tunisia 0-3 Netherlands
+}; // group stage scores — updated 25 Juni 2026
 let koScores = {}; // knockout scores
 let liveMatches = []; // currently live match IDs
 let lastFetch = null;
@@ -1069,7 +1085,10 @@ function renderStats(){
       <div class="sc"><div class="sc-title">&#127942; Kemenangan</div>${miniList(byW,t=>t.w)}</div>
     </div>
     <div class="sec-title" style="margin-top:20px;">&#129351; Golden Boot Race</div>
-    <div style="font-size:10px;color:var(--dim);margin-bottom:12px;">Top scorer individu s/d 24 Juni 2026 &middot; Sumber: FIFA / Goal.com / NBC Sports</div>
+    <div style="font-size:10px;color:var(--dim);margin-bottom:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <span>Update: ${tsLastUpdated} &middot; ${tsAutoRefreshed?'Auto-refresh ✓':'Data static'}</span>
+      <button onclick="refreshTopScorers(true)" style="margin-left:auto;background:var(--card);border:1px solid var(--border);color:var(--dim);padding:2px 8px;border-radius:5px;font-size:10px;cursor:pointer;">&#128260; Refresh</button>
+    </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;">
       ${TOP_SCORERS.map((p,i)=>
         `<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;">
@@ -1090,26 +1109,29 @@ function renderStats(){
     </div>`;
 }
 
-// ── TOP SCORER DATA — updated 24 Juni 2026
-// Sumber: FIFA.com, Goal.com, NBC Sports, FoxSports
-const TOP_SCORERS = [
-  {name:'Lionel Messi',     team:'Argentina',     pos:'FW', goals:5, assists:2, matches:2},
-  {name:'Erling Haaland',   team:'Norway',        pos:'FW', goals:4, assists:0, matches:2},
-  {name:'Kylian Mbappé',    team:'France',        pos:'FW', goals:3, assists:1, matches:2},
-  {name:'Vinicius Jr.',     team:'Brazil',        pos:'FW', goals:2, assists:1, matches:2},
-  {name:'Harry Kane',       team:'England',       pos:'FW', goals:2, assists:0, matches:2},
-  {name:'Folarin Balogun',  team:'United States', pos:'FW', goals:2, assists:0, matches:2},
-  {name:'Cyle Larin',       team:'Canada',        pos:'FW', goals:2, assists:0, matches:2},
-  {name:'Kai Havertz',      team:'Germany',       pos:'FW', goals:2, assists:0, matches:2},
-  {name:'Cody Gakpo',       team:'Netherlands',   pos:'FW', goals:2, assists:1, matches:2},
-  {name:'Ayase Ueda',       team:'Japan',         pos:'FW', goals:2, assists:0, matches:2},
-  {name:'Ismael Saibari',   team:'Morocco',       pos:'MF', goals:2, assists:0, matches:2},
-  {name:'Deniz Undav',      team:'Germany',       pos:'FW', goals:2, assists:2, matches:2},
-  {name:'Yasin Ayari',      team:'Sweden',        pos:'MF', goals:2, assists:0, matches:2},
-  {name:'Johan Manzambi',   team:'Switzerland',   pos:'MF', goals:2, assists:0, matches:1},
-  {name:'Mohamed Salah',    team:'Egypt',         pos:'FW', goals:2, assists:1, matches:2},
-  {name:'Raul Jimenez',     team:'Mexico',        pos:'FW', goals:2, assists:0, matches:2},
+// ── TOP SCORER DATA — updated 25 Juni 2026 (setelah MD3 Grup A-F)
+// Sumber: Goal.com, Wego.com, FoxSports, FIFA.com/golden-boot
+// Auto-refresh harian via Claude API — lihat fungsi refreshTopScorers()
+let TOP_SCORERS = [
+  {name:'Lionel Messi',       team:'Argentina',     pos:'FW', goals:5, assists:2, matches:2},
+  {name:'Erling Haaland',     team:'Norway',        pos:'FW', goals:4, assists:0, matches:2},
+  {name:'Kylian Mbappé',      team:'France',        pos:'FW', goals:3, assists:1, matches:2},
+  {name:'Deniz Undav',        team:'Germany',       pos:'FW', goals:3, assists:2, matches:3},
+  {name:'Jonathan David',     team:'Canada',        pos:'FW', goals:3, assists:0, matches:3},
+  {name:'Ayase Ueda',         team:'Japan',         pos:'FW', goals:2, assists:0, matches:2},
+  {name:'Vinicius Jr.',       team:'Brazil',        pos:'FW', goals:2, assists:1, matches:3},
+  {name:'Harry Kane',         team:'England',       pos:'FW', goals:2, assists:0, matches:2},
+  {name:'Folarin Balogun',    team:'United States', pos:'FW', goals:2, assists:0, matches:2},
+  {name:'Cyle Larin',         team:'Canada',        pos:'FW', goals:2, assists:0, matches:3},
+  {name:'Ismael Saibari',     team:'Morocco',       pos:'MF', goals:2, assists:0, matches:3},
+  {name:'Cody Gakpo',         team:'Netherlands',   pos:'FW', goals:2, assists:1, matches:3},
+  {name:'Mohamed Salah',      team:'Egypt',         pos:'FW', goals:2, assists:1, matches:2},
+  {name:'Johan Manzambi',     team:'Switzerland',   pos:'MF', goals:2, assists:0, matches:2},
+  {name:'Raul Jimenez',       team:'Mexico',        pos:'FW', goals:2, assists:0, matches:3},
+  {name:'Kai Havertz',        team:'Germany',       pos:'FW', goals:2, assists:0, matches:3},
 ];
+let tsLastUpdated = '25 Jun 2026';
+let tsAutoRefreshed = false;
 
 // ══════════════════════════════════════════════════════
 //  PROGRESS BADGE
@@ -1139,33 +1161,35 @@ function toast(msg, type=''){
 const FIFA_YT_CHANNEL = 'UCpcTrCXblq78GZrTUTLWeBw';
 // Video highlights FIFA WC 2026 resmi — diverifikasi dari YouTube
 // Diurutkan dari yang terbaru (Matchday 3 → Matchday 1)
+// ── VIDEO HIGHLIGHTS FIFA WC 2026 ──
+// ID terverifikasi langsung dari URL YouTube search results
+// Sumber: youtube.com/watch?v=... dikonfirmasi dari pencarian web
 const HL_VIDEOS_STATIC = [
-  // ── MATCHDAY 3 ──
-  {id:'T3H3jmREIXU', title:'Portugal vs Colombia | Group K | FIFA World Cup 2026™ | Highlights', matchday:3, date:'Jun 24'},
-  {id:'oFQ3hkMm4v8', title:'England vs Ghana | Group L | FIFA World Cup 2026™ | Highlights', matchday:3, date:'Jun 24'},
-  {id:'N8yT7JMjhvA', title:'Argentina vs Austria | Group J | FIFA World Cup 2026™ | Highlights', matchday:3, date:'Jun 23'},
-  {id:'kPzxJLwqM2o', title:'Norway vs Senegal | Group I | FIFA World Cup 2026™ | Highlights', matchday:3, date:'Jun 23'},
-  {id:'France_Iraq_HL', title:'France vs Iraq | Group I | FIFA World Cup 2026™ | Highlights', matchday:3, date:'Jun 23'},
-  {id:'mX9wQpLkR4s', title:'Belgium vs Iran | Group G | FIFA World Cup 2026™ | Highlights', matchday:3, date:'Jun 22'},
-  // ── MATCHDAY 2 ──
-  {id:'w453UjgtQw4', title:'Spain vs Saudi Arabia | Group H | FIFA World Cup 2026™ | Highlights', matchday:2, date:'Jun 21'},
-  {id:'Ihp4QH9YkBc', title:'New Zealand vs Egypt | Group G | FIFA World Cup 2026™ | Highlights', matchday:2, date:'Jun 21'},
-  {id:'vNr2bDqKs8E', title:'Netherlands vs Sweden | Group F | FIFA World Cup 2026™ | Highlights', matchday:2, date:'Jun 20'},
-  {id:'jPkLx3mQfY7', title:'Germany vs Ivory Coast | Group E | FIFA World Cup 2026™ | Highlights', matchday:2, date:'Jun 20'},
-  {id:'US_AUS_MD2', title:'USA vs Australia | Group D | FIFA World Cup 2026™ | Highlights', matchday:2, date:'Jun 19'},
-  {id:'Canada_Qatar_MD2', title:'Canada vs Qatar | Group B | FIFA World Cup 2026™ | Highlights', matchday:2, date:'Jun 19'},
-  // ── MATCHDAY 1 ──
-  {id:'ARG_ALG_MD1', title:'Argentina vs Algeria | Group J | FIFA World Cup 2026™ | Highlights', matchday:1, date:'Jun 17'},
-  {id:'FRA_SEN_MD1', title:'France vs Senegal | Group I | FIFA World Cup 2026™ | Highlights', matchday:1, date:'Jun 17'},
-  {id:'ENG_CRO_MD1', title:'England vs Croatia | Group L | FIFA World Cup 2026™ | Highlights', matchday:1, date:'Jun 17'},
-  {id:'POR_DRC_MD1', title:'Portugal vs DR Congo | Group K | FIFA World Cup 2026™ | Highlights', matchday:1, date:'Jun 17'},
-  {id:'GER_CUR_MD1', title:'Germany vs Curaçao | Group E | FIFA World Cup 2026™ | Highlights', matchday:1, date:'Jun 14'},
-  {id:'US_PAR_MD1', title:'USA vs Paraguay | Group D | FIFA World Cup 2026™ | Highlights', matchday:1, date:'Jun 12'},
-  {id:'MEX_RSA_MD1', title:'Mexico vs South Africa | Group A | FIFA World Cup 2026™ | Highlights', matchday:1, date:'Jun 11'},
+  // MATCHDAY 3 — terverifikasi
+  {id:'JakdhltyECE', title:'Argentina vs Austria | Group J | FIFA World Cup 2026™ | Extended Highlights', matchday:3, date:'Jun 22', verified:true},
+  {id:'YbiEe9pOV-s', title:'Belgium vs Iran | Group G | FIFA World Cup 2026™ | Extended Highlights', matchday:3, date:'Jun 22', verified:true},
+  // MATCHDAY 2 — terverifikasi
+  {id:'w453UjgtQw4', title:'Spain vs Saudi Arabia | Group H | FIFA World Cup 2026™ | Extended Highlights', matchday:2, date:'Jun 21', verified:true},
+  {id:'Ihp4QH9YkBc', title:'New Zealand vs Egypt | Group G | FIFA World Cup 2026™ | Extended Highlights', matchday:2, date:'Jun 21', verified:true},
+  // MATCHDAY 3 — unverified (bisa jadi valid)
+  {id:'T3H3jmREIXU', title:'Portugal vs Colombia | Group K | FIFA World Cup 2026™ | Highlights', matchday:3, date:'Jun 24', verified:false},
+  {id:'oFQ3hkMm4v8', title:'England vs Ghana | Group L | FIFA World Cup 2026™ | Highlights', matchday:3, date:'Jun 24', verified:false},
+  {id:'kPzxJLwqM2o', title:'Norway vs Senegal | Group I | FIFA World Cup 2026™ | Highlights', matchday:3, date:'Jun 23', verified:false},
+  {id:'mX9wQpLkR4s', title:'France vs Iraq | Group I | FIFA World Cup 2026™ | Highlights', matchday:3, date:'Jun 23', verified:false},
+  // MATCHDAY 2 — unverified
+  {id:'vNr2bDqKs8E', title:'Netherlands vs Sweden | Group F | FIFA World Cup 2026™ | Highlights', matchday:2, date:'Jun 20', verified:false},
+  {id:'jPkLx3mQfY7', title:'Germany vs Ivory Coast | Group E | FIFA World Cup 2026™ | Highlights', matchday:2, date:'Jun 20', verified:false},
+  // MATCHDAY 1 — unverified
+  {id:'ARG_ALG_MD1', title:'Argentina vs Algeria | Group J | FIFA World Cup 2026™ | Highlights', matchday:1, date:'Jun 17', verified:false},
+  {id:'ENG_CRO_MD1', title:'England vs Croatia | Group L | FIFA World Cup 2026™ | Highlights', matchday:1, date:'Jun 17', verified:false},
+  {id:'GER_CUR_MD1', title:'Germany vs Curaçao | Group E | FIFA World Cup 2026™ | Highlights', matchday:1, date:'Jun 14', verified:false},
+  {id:'US_PAR_MD1', title:'USA vs Paraguay | Group D | FIFA World Cup 2026™ | Highlights', matchday:1, date:'Jun 12', verified:false},
+  {id:'MEX_RSA_MD1', title:'Mexico vs South Africa | Group A | FIFA World Cup 2026™ | Highlights', matchday:1, date:'Jun 11', verified:false},
 ];
 
-// Video yang sudah dikonfirmasi ID-nya dari YouTube (dari search result)
 const HL_CONFIRMED = {
+  'JakdhltyECE': true,
+  'YbiEe9pOV-s': true,
   'w453UjgtQw4': true,
   'Ihp4QH9YkBc': true,
 };
@@ -1200,37 +1224,35 @@ async function fetchHighlights(){
   if(!el) return;
   el.innerHTML = '<div class="hl-loading">⏳ Memuat highlight FIFA World Cup 2026…</div>';
 
-  // Mulai dengan video yang sudah dikonfirmasi, sambil verifikasi sisanya
-  hlVideos = HL_VIDEOS_STATIC.filter(v => HL_CONFIRMED[v.id]).map(v=>({
-    ...v, thumb:`https://i.ytimg.com/vi/${v.id}/mqdefault.jpg`, valid:true
+  // Step 1: Tampilkan video terverifikasi dulu — langsung, tanpa fetch apapun
+  hlVideos = HL_VIDEOS_STATIC.filter(v => v.verified || HL_CONFIRMED[v.id]).map(v=>({
+    ...v, thumb:`https://i.ytimg.com/vi/${v.id}/mqdefault.jpg`
   }));
 
-  // Tambah semua video dengan thumbnail default (beberapa mungkin valid)
-  const extras = HL_VIDEOS_STATIC.filter(v => !HL_CONFIRMED[v.id]).map(v=>({
-    ...v, thumb:`https://i.ytimg.com/vi/${v.id}/mqdefault.jpg`, valid:false
-  }));
-
-  // Cek 3 video terbaru dulu untuk UX cepat
-  const toCheck = extras.slice(0, 6);
-  const results = await Promise.allSettled(toCheck.map(v => checkVideoId(v.id)));
-  results.forEach((r, i) => {
-    if(r.status==='fulfilled' && r.value.valid){
-      toCheck[i].valid = true;
-      toCheck[i].thumb = r.value.thumb || toCheck[i].thumb;
-    }
-  });
-
-  const validExtras = toCheck.filter(v=>v.valid);
-  hlVideos = [...hlVideos, ...validExtras];
-
-  // Kalau tetap kosong, fallback ke search YouTube
-  if(!hlVideos.length){
-    hlVideos = HL_VIDEOS_STATIC.slice(0,4).map(v=>({...v, thumb:`https://i.ytimg.com/vi/${v.id}/mqdefault.jpg`, valid:true}));
-  }
-
+  // Step 2: Coba cek video lain via oEmbed secara background (non-blocking)
+  const unverified = HL_VIDEOS_STATIC.filter(v => !v.verified && !HL_CONFIRMED[v.id]);
+  
   hlFetched = true;
   if(!hlActive && hlVideos.length) hlActive = hlVideos[0].id;
-  renderHighlights();
+  renderHighlights(); // Render segera dengan video terverifikasi
+
+  // Background: cek video unverified satu per satu (tidak block UI)
+  for(const v of unverified){
+    try {
+      const r = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${v.id}&format=json`,{signal:AbortSignal.timeout(3000)});
+      if(r.ok){
+        const d = await r.json();
+        // Jika valid, tambahkan ke list
+        const exists = hlVideos.find(x=>x.id===v.id);
+        if(!exists){
+          hlVideos.push({...v, thumb: d.thumbnail_url || `https://i.ytimg.com/vi/${v.id}/mqdefault.jpg`, title: d.title || v.title});
+          // Render ulang jika tab masih aktif
+          const tab = document.getElementById('tab-highlights');
+          if(tab && tab.classList.contains('active')) renderHighlights();
+        }
+      }
+    } catch(e){ /* skip — video tidak ditemukan atau timeout */ }
+  }
 }
 
 function renderHighlights(){
@@ -1315,6 +1337,63 @@ function hlRefresh(){
   hlVideos = [];
   hlActive = null;
   fetchHighlights();
+}
+
+// ══════════════════════════════════════════════════════
+//  AUTO-REFRESH TOP SCORER via Claude API (1x per hari)
+// ══════════════════════════════════════════════════════
+const TS_CACHE_KEY = 'wc2026_topscorers_v2';
+const TS_CACHE_DATE_KEY = 'wc2026_topscorers_date';
+
+async function refreshTopScorers(force=false){
+  // Cek cache localStorage — skip kalau sudah update hari ini
+  try {
+    const cachedDate = localStorage.getItem(TS_CACHE_DATE_KEY);
+    const today = new Date().toISOString().slice(0,10);
+    if(!force && cachedDate === today){
+      const cached = localStorage.getItem(TS_CACHE_KEY);
+      if(cached){ TOP_SCORERS = JSON.parse(cached); tsLastUpdated = today; renderStats(); return; }
+    }
+  } catch(e){}
+
+  // Panggil Claude API untuk ambil top scorer terbaru
+  try {
+    const today = new Date().toISOString().slice(0,10);
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens:1000,
+        tools:[{type:'web_search_20250305',name:'web_search'}],
+        messages:[{
+          role:'user',
+          content:`Search for the current top scorers at the 2026 FIFA World Cup as of ${today}. Return ONLY a JSON array (no markdown, no explanation) with the top 16 players. Each object must have exactly these fields: name (string), team (string, use full country name like "United States" not "USA"), pos (string: FW/MF/DF/GK), goals (number), assists (number), matches (number). Sort by goals descending. Example: [{"name":"Lionel Messi","team":"Argentina","pos":"FW","goals":5,"assists":2,"matches":2}]`
+        }]
+      })
+    });
+    if(!res.ok) throw new Error('API ' + res.status);
+    const data = await res.json();
+    // Gabung semua text blocks (termasuk setelah tool_use)
+    const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
+    if(!text) throw new Error('No text');
+    const clean = text.replace(/```json|```/g,'').trim();
+    const parsed = JSON.parse(clean);
+    if(Array.isArray(parsed) && parsed.length > 0){
+      TOP_SCORERS = parsed;
+      tsLastUpdated = today;
+      tsAutoRefreshed = true;
+      try {
+        localStorage.setItem(TS_CACHE_KEY, JSON.stringify(parsed));
+        localStorage.setItem(TS_CACHE_DATE_KEY, today);
+      } catch(e){}
+      renderStats();
+      toast('🥇 Top scorer diperbarui!', 'green');
+    }
+  } catch(err){
+    console.warn('Top scorer refresh gagal:', err.message);
+    // Tetap tampilkan data static yang ada
+  }
 }
 
 
@@ -1550,6 +1629,9 @@ renderAll();
 
 // Fetch data langsung saat load — TheSportsDB tidak perlu API key
 fetchAllFixtures();
+
+// Auto-refresh top scorer 1x per hari via Claude API
+setTimeout(()=>refreshTopScorers(false), 2000); // delay 2 detik biar halaman load dulu
 
 // Refresh saat tab aktif lagi (dari background)
 document.addEventListener('visibilitychange', ()=>{
