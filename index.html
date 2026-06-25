@@ -1220,44 +1220,38 @@ async function checkVideoId(id){
 
 async function fetchHighlights(){
   if(hlFetched) return;
-  const el = document.getElementById('tab-highlights');
-  if(!el) return;
-  el.innerHTML = '<div class="hl-loading">⏳ Memuat highlight FIFA World Cup 2026…</div>';
 
-  // Step 1: Tampilkan video terverifikasi dulu — langsung, tanpa fetch apapun
-  hlVideos = HL_VIDEOS_STATIC.filter(v => v.verified || HL_CONFIRMED[v.id]).map(v=>({
-    ...v, thumb:`https://i.ytimg.com/vi/${v.id}/mqdefault.jpg`
-  }));
+  // Langsung load video verified — tidak perlu cek DOM atau tab state
+  hlVideos = HL_VIDEOS_STATIC
+    .filter(v => v.verified || HL_CONFIRMED[v.id])
+    .map(v => ({ ...v, thumb: 'https://i.ytimg.com/vi/'+v.id+'/mqdefault.jpg' }));
 
-  // Step 2: Coba cek video lain via oEmbed secara background (non-blocking)
-  const unverified = HL_VIDEOS_STATIC.filter(v => !v.verified && !HL_CONFIRMED[v.id]);
-  
   hlFetched = true;
   if(!hlActive && hlVideos.length) hlActive = hlVideos[0].id;
-  renderHighlights(); // Render segera dengan video terverifikasi
+  renderHighlights(); // render sekarang, apapun state tab-nya
 
-  // Background: cek video unverified satu per satu (tidak block UI)
+  // Background: verifikasi video yang belum confirmed
+  const unverified = HL_VIDEOS_STATIC.filter(v => !v.verified && !HL_CONFIRMED[v.id]);
   for(const v of unverified){
     try {
-      const r = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${v.id}&format=json`,{signal:AbortSignal.timeout(3000)});
+      const r = await fetch('https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v='+v.id+'&format=json',
+        {signal:AbortSignal.timeout(3000)});
       if(r.ok){
         const d = await r.json();
-        // Jika valid, tambahkan ke list
-        const exists = hlVideos.find(x=>x.id===v.id);
-        if(!exists){
-          hlVideos.push({...v, thumb: d.thumbnail_url || `https://i.ytimg.com/vi/${v.id}/mqdefault.jpg`, title: d.title || v.title});
-          // Render ulang jika tab masih aktif
-          const tab = document.getElementById('tab-highlights');
-          if(tab && tab.classList.contains('active')) renderHighlights();
+        if(!hlVideos.find(x=>x.id===v.id)){
+          hlVideos.push({...v,
+            thumb: d.thumbnail_url||'https://i.ytimg.com/vi/'+v.id+'/mqdefault.jpg',
+            title: d.title||v.title, verified:true});
+          renderHighlights();
         }
       }
-    } catch(e){ /* skip — video tidak ditemukan atau timeout */ }
+    } catch(e){}
   }
 }
 
 function renderHighlights(){
   const el = document.getElementById('tab-highlights');
-  if(!el || !el.classList.contains('active')) return;
+  if(!el) return;
   if(!hlFetched && !hlVideos.length){ fetchHighlights(); return; }
 
   const filtered = hlMdFilter==='all' ? hlVideos : hlVideos.filter(v=>v.matchday==hlMdFilter);
@@ -1607,6 +1601,11 @@ function showTab(id, btn){
     });
   } else {
     document.querySelectorAll(`.bn-btn[data-tab="${id}"]`).forEach(b=>b.classList.add('active'));
+  }
+  // Trigger highlights
+  if(id === 'highlights'){
+    if(!hlFetched){ fetchHighlights(); }
+    else { renderHighlights(); }
   }
 }
 
