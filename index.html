@@ -232,9 +232,21 @@ main{max-width:1400px;margin:0 auto;padding:14px 12px 80px;}
 }
 
 /* ══ HIGHLIGHTS TAB ══ */
-.hl-player{position:relative;padding-top:56.25%;border-radius:12px;overflow:hidden;background:#000;margin-bottom:14px;}
-.hl-player iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;}
-.hl-player.empty{padding-top:0;height:100px;display:flex;align-items:center;justify-content:center;background:var(--card);border:1px solid var(--border);}
+.hl-player{display:none;} /* tidak dipakai, semua tap-to-youtube */
+.hl-featured{position:relative;border-radius:12px;overflow:hidden;background:#000;margin-bottom:14px;cursor:pointer;display:block;text-decoration:none;}
+.hl-featured img{width:100%;display:block;aspect-ratio:16/9;object-fit:cover;}
+.hl-featured-overlay{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.8) 0%,transparent 50%);display:flex;flex-direction:column;justify-content:flex-end;padding:14px;}
+.hl-featured-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:56px;height:56px;border-radius:50%;background:rgba(204,0,0,.9);display:flex;align-items:center;justify-content:center;font-size:22px;padding-left:4px;transition:transform .15s;}
+.hl-featured:hover .hl-featured-play{transform:translate(-50%,-50%) scale(1.1);}
+.hl-featured-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:3px;}
+.hl-featured-meta{font-size:10px;color:rgba(255,255,255,.6);}
+.hl-geo-banner{background:rgba(245,197,24,.08);border:1px solid rgba(245,197,24,.3);border-radius:10px;padding:12px 14px;margin-bottom:14px;display:flex;gap:10px;align-items:flex-start;}
+.hl-geo-icon{font-size:20px;flex-shrink:0;}
+.hl-geo-title{font-size:12px;font-weight:700;color:var(--accent);margin-bottom:4px;}
+.hl-geo-text{font-size:11px;color:var(--dim);line-height:1.6;}
+.hl-platform-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.hl-platform-btn{display:inline-flex;align-items:center;gap:5px;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;color:var(--text);text-decoration:none;transition:border-color .15s;}
+.hl-platform-btn:hover{border-color:var(--accent);}
 .vid-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;}
 .vid-card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;cursor:pointer;transition:border-color .15s,transform .15s;}
 .vid-card:hover{border-color:var(--accent2);transform:translateY(-2px);}
@@ -299,7 +311,7 @@ main{max-width:1400px;margin:0 auto;padding:14px 12px 80px;}
     <div class="status-bar">
       <div class="sync-dot" id="sync-dot"></div>
       <span class="sync-label" id="sync-label">Menghubungkan…</span>
-      <div class="progress-badge" id="progress-badge">58/72</div>
+      <div class="progress-badge" id="progress-badge">54/72</div>
     </div>
   </div>
 </header>
@@ -508,8 +520,11 @@ const GM=[
 //  STATE
 // ══════════════════════════════════════════════════════
 // Skor hasil pertandingan s/d 24 Juni 2026 (pre-loaded, akan di-override oleh API)
+// ══ SKOR HARDCODED — MD1 & MD2 lengkap + MD3 yang sudah selesai ══
+// Sumber: Yahoo Sports / CBS Sports / ESPN — verified 25 Jun 2026
+// MD3 yang BELUM selesai (Grup D,E,F,G,H,I,J,K,L) akan diisi otomatis via TheSportsDB
 let scores = {
-  // MATCHDAY 1
+  // ── MATCHDAY 1 ──
   1:{home:2,away:0,done:true,live:false},  // Mexico 2-0 South Africa
   2:{home:2,away:1,done:true,live:false},  // Korea Republic 2-1 Czech Republic
   3:{home:1,away:1,done:true,live:false},  // Canada 1-1 Bosnia and Herzegovina
@@ -519,7 +534,7 @@ let scores = {
   7:{home:1,away:1,done:true,live:false},  // Brazil 1-1 Morocco
   8:{home:1,away:1,done:true,live:false},  // Qatar 1-1 Switzerland
   9:{home:1,away:0,done:true,live:false},  // Ivory Coast 1-0 Ecuador
-  10:{home:7,away:1,done:true,live:false}, // Germany 7-1 Curacao
+  10:{home:7,away:1,done:true,live:false}, // Germany 7-1 Curaçao
   11:{home:2,away:2,done:true,live:false}, // Netherlands 2-2 Japan
   12:{home:5,away:1,done:true,live:false}, // Sweden 5-1 Tunisia
   13:{home:1,away:1,done:true,live:false}, // Saudi Arabia 1-1 Uruguay
@@ -534,7 +549,7 @@ let scores = {
   22:{home:4,away:2,done:true,live:false}, // England 4-2 Croatia
   23:{home:1,away:1,done:true,live:false}, // Portugal 1-1 DR Congo
   24:{home:1,away:3,done:true,live:false}, // Uzbekistan 1-3 Colombia
-  // MATCHDAY 2
+  // ── MATCHDAY 2 ──
   25:{home:1,away:1,done:true,live:false}, // Czech Republic 1-1 South Africa
   26:{home:4,away:1,done:true,live:false}, // Switzerland 4-1 Bosnia and Herzegovina
   27:{home:6,away:0,done:true,live:false}, // Canada 6-0 Qatar
@@ -544,7 +559,7 @@ let scores = {
   31:{home:2,away:0,done:true,live:false}, // United States 2-0 Australia
   32:{home:0,away:1,done:true,live:false}, // Turkey 0-1 Paraguay
   33:{home:2,away:1,done:true,live:false}, // Germany 2-1 Ivory Coast
-  34:{home:0,away:0,done:true,live:false}, // Ecuador 0-0 Curacao
+  34:{home:0,away:0,done:true,live:false}, // Ecuador 0-0 Curaçao
   35:{home:5,away:1,done:true,live:false}, // Netherlands 5-1 Sweden
   36:{home:0,away:4,done:true,live:false}, // Tunisia 0-4 Japan
   37:{home:2,away:2,done:true,live:false}, // Uruguay 2-2 Cape Verde
@@ -559,23 +574,18 @@ let scores = {
   46:{home:0,away:1,done:true,live:false}, // Panama 0-1 Croatia
   47:{home:5,away:0,done:true,live:false}, // Portugal 5-0 Uzbekistan
   48:{home:3,away:1,done:true,live:false}, // Colombia 3-1 DR Congo
-  // ── MATCHDAY 3 ── (sudah selesai per 25 Juni 2026)
-  // Grup C — 24 Jun
-  49:{home:1,away:1,done:true,live:false}, // Scotland 1-1 Brazil
-  50:{home:2,away:0,done:true,live:false}, // Morocco 2-0 Haiti
-  // Grup B — 25 Jun
-  51:{home:1,away:0,done:true,live:false}, // Switzerland 1-0 Canada
-  52:{home:2,away:1,done:true,live:false}, // Bosnia and Herzegovina 2-1 Qatar
-  // Grup A — 25 Jun
-  53:{home:1,away:2,done:true,live:false}, // Czech Republic 1-2 Mexico
-  54:{home:0,away:0,done:true,live:false}, // South Africa 0-0 Korea Republic
-  // Grup E — 25 Jun
-  55:{home:0,away:2,done:true,live:false}, // Curaçao 0-2 Ivory Coast
-  56:{home:0,away:2,done:true,live:false}, // Ecuador 0-2 Germany
-  // Grup F — 25 Jun
-  57:{home:2,away:1,done:true,live:false}, // Japan 2-1 Sweden
-  58:{home:0,away:3,done:true,live:false}, // Tunisia 0-3 Netherlands
-}; // group stage scores — updated 25 Juni 2026
+  // ── MATCHDAY 3 — hanya yang sudah CONFIRMED selesai ──
+  // Grup B — 24 Jun ✅
+  51:{home:2,away:1,done:true,live:false}, // Switzerland 2-1 Canada
+  52:{home:3,away:1,done:true,live:false}, // Bosnia and Herzegovina 3-1 Qatar
+  // Grup C — 24 Jun ✅
+  49:{home:0,away:3,done:true,live:false}, // Scotland 0-3 Brazil (Cunha x2, Vinicius)
+  50:{home:4,away:2,done:true,live:false}, // Morocco 4-2 Haiti
+  // Grup A — 25 Jun ✅ (Yahoo Sports / ESPN confirmed)
+  53:{home:3,away:0,done:true,live:false}, // Czech Republic 0-3 Mexico → jadwal: Czech(home) vs Mexico(away)
+  54:{home:1,away:0,done:true,live:false}, // South Africa 1-0 Korea Republic
+  // Grup D, E, F, G, H, I, J, K, L MD3 — belum selesai, auto-update via TheSportsDB
+}; // scores — MD1+MD2 full, MD3 Grup A/B/C done | update otomatis tiap 5 menit
 let koScores = {}; // knockout scores
 let liveMatches = []; // currently live match IDs
 let lastFetch = null;
@@ -1255,14 +1265,15 @@ function renderHighlights(){
   if(!hlFetched && !hlVideos.length){ fetchHighlights(); return; }
 
   const filtered = hlMdFilter==='all' ? hlVideos : hlVideos.filter(v=>v.matchday==hlMdFilter);
-  const activeVid = filtered.find(v=>v.id===hlActive) || filtered[0];
+  const featured = filtered[0];
 
   const filterBtns = ['all',1,2,3].map(md=>
     `<button class="fb ${hlMdFilter==md?'active':''}" onclick="hlSetFilter('${md}')">${md==='all'?'Semua':'MD '+md}</button>`
   ).join('');
 
-  const cards = filtered.map(v=>
-    `<div class="vid-card ${v.id===hlActive?'active':''}" onclick="hlPlay('${v.id}')">
+  // Semua card = link langsung ke YouTube (tap to open), BUKAN embed iframe
+  const cards = filtered.map((v,i)=>
+    `<a class="vid-card${i===0?' active':''}" href="https://www.youtube.com/watch?v=${v.id}" target="_blank" rel="noopener">
       <div class="vid-thumb">
         <img src="${v.thumb}" alt="" loading="lazy"
           onerror="this.parentElement.style.background='#1e2d4a';this.style.opacity='0.3'">
@@ -1270,43 +1281,61 @@ function renderHighlights(){
       </div>
       <div class="vid-info">
         <div class="vid-title">${v.title}</div>
-        <div class="vid-meta">MD${v.matchday} &middot; ${v.date||''}</div>
+        <div class="vid-meta">MD${v.matchday} &middot; ${v.date||''} &middot; Tap untuk buka di YouTube</div>
       </div>
-    </div>`
+    </a>`
   ).join('');
 
   el.innerHTML = `
     <div class="sec-title">&#127916; Highlights FIFA World Cup 2026</div>
+
+    <!-- Info geoblocking Indonesia -->
+    <div class="hl-geo-banner">
+      <div class="hl-geo-icon">&#127470;&#127465;</div>
+      <div>
+        <div class="hl-geo-title">Nonton resmi di Indonesia</div>
+        <div class="hl-geo-text">
+          Video YouTube highlights diblokir di Indonesia karena hak siar dipegang <strong>TVRI</strong>.
+          Tap kartu di bawah untuk buka di YouTube (komentar Bahasa Inggris/Portugis),
+          atau tonton via platform resmi Indonesia:
+        </div>
+        <div class="hl-platform-row">
+          <a class="hl-platform-btn" href="https://www.tvri.go.id" target="_blank" rel="noopener">&#128250; TVRI (Gratis)</a>
+          <a class="hl-platform-btn" href="https://www.folaplay.id" target="_blank" rel="noopener">&#9917; Fola Play</a>
+          <a class="hl-platform-btn" href="https://maxstream.tv" target="_blank" rel="noopener">&#128225; MAXstream</a>
+          <a class="hl-platform-btn" href="https://www.youtube.com/@CazeTVOficial" target="_blank" rel="noopener">&#127463;&#127479; CazéTV (Brasil)</a>
+        </div>
+      </div>
+    </div>
+
     <div class="hl-src-note">
-      &#128250; <a href="https://www.youtube.com/@fifa/videos" target="_blank">FIFA Official YouTube</a>
-      &nbsp;&middot;&nbsp; ${hlVideos.length} video tersedia
+      &#128250; Sumber: <a href="https://www.youtube.com/@fifa/videos" target="_blank">FIFA YouTube</a>
+      &nbsp;&middot;&nbsp; ${hlVideos.length} highlight tersedia &middot; Tap untuk buka di YouTube
       <button onclick="hlRefresh()" style="margin-left:auto;background:var(--card);border:1px solid var(--border);color:var(--dim);padding:3px 8px;border-radius:5px;font-size:10px;cursor:pointer;">&#128260; Refresh</button>
     </div>
+
     <div class="hl-filter-bar">${filterBtns}</div>
-    ${activeVid ? `
-    <div class="hl-player">
-      <iframe
-        src="https://www.youtube.com/embed/${activeVid.id}?rel=0&modestbranding=1"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen loading="lazy">
-      </iframe>
-    </div>
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:14px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
-      <div>
-        <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px;">${activeVid.title}</div>
-        <div style="font-size:10px;color:var(--dim);">Matchday ${activeVid.matchday} &middot; ${activeVid.date||''}</div>
+
+    ${featured ? `
+    <a class="hl-featured" href="https://www.youtube.com/watch?v=${featured.id}" target="_blank" rel="noopener">
+      <img src="${featured.thumb.replace('mqdefault','hqdefault')}" alt="${featured.title}" loading="lazy"
+        onerror="this.src='${featured.thumb}'">
+      <div class="hl-featured-overlay">
+        <div class="hl-featured-play">&#9654;</div>
+        <div class="hl-featured-title">${featured.title}</div>
+        <div class="hl-featured-meta">MD${featured.matchday} &middot; ${featured.date||''} &middot; Buka di YouTube &#8599;</div>
       </div>
-      <a href="https://www.youtube.com/watch?v=${activeVid.id}" target="_blank"
-        style="flex-shrink:0;background:#cc0000;color:#fff;font-size:10px;font-weight:700;padding:5px 10px;border-radius:6px;text-decoration:none;white-space:nowrap;">
-        &#9654; YouTube
-      </a>
-    </div>` : `<div class="hl-err">Pilih video di bawah untuk diputar.</div>`}
-    <div class="sec-title" style="font-size:14px;">Daftar Highlight</div>
-    ${filtered.length ? `<div class="vid-grid">${cards}</div>` : `<div class="hl-err">Tidak ada video untuk filter ini.</div>`}
+    </a>` : ''}
+
+    <div class="sec-title" style="font-size:14px;">Semua Highlight</div>
+    ${filtered.length
+      ? `<div class="vid-grid">${cards}</div>`
+      : `<div class="hl-err">Tidak ada video untuk filter ini.</div>`}
+
     <div style="margin-top:16px;text-align:center;padding-bottom:8px;">
-      <a href="https://www.youtube.com/@fifa/videos" target="_blank"
-        style="display:inline-flex;align-items:center;gap:6px;background:#cc0000;color:#fff;font-size:12px;font-weight:600;padding:8px 16px;border-radius:8px;text-decoration:none;">
-        &#128250; Lihat semua di FIFA YouTube
+      <a href="https://www.youtube.com/results?search_query=FIFA+World+Cup+2026+highlights" target="_blank" rel="noopener"
+        style="display:inline-flex;align-items:center;gap:6px;background:#cc0000;color:#fff;font-size:12px;font-weight:600;padding:9px 18px;border-radius:8px;text-decoration:none;">
+        &#128250; Cari semua highlight di YouTube
       </a>
     </div>`;
 }
@@ -1320,10 +1349,8 @@ function hlSetFilter(md){
 }
 
 function hlPlay(id){
-  hlActive = id;
-  renderHighlights();
-  // Scroll ke atas player
-  document.getElementById('tab-highlights').scrollIntoView({behavior:'smooth',block:'start'});
+  // Buka langsung di YouTube (geoblocking workaround)
+  window.open('https://www.youtube.com/watch?v='+id, '_blank', 'noopener');
 }
 
 function hlRefresh(){
@@ -1626,11 +1653,20 @@ function renderAll(){
 // ══════════════════════════════════════════════════════
 renderAll();
 
-// Fetch data langsung saat load — TheSportsDB tidak perlu API key
+// ── AUTO-UPDATE via TheSportsDB (tanpa API key) ──
+// Fetch semua fixture + skor langsung saat load
 fetchAllFixtures();
 
 // Auto-refresh top scorer 1x per hari via Claude API
-setTimeout(()=>refreshTopScorers(false), 2000); // delay 2 detik biar halaman load dulu
+setTimeout(()=>refreshTopScorers(false), 3000);
+
+// Paksa re-fetch saat user kembali ke tab (misalnya dari background HP)
+document.addEventListener('visibilitychange', ()=>{
+  if(document.visibilityState === 'visible'){
+    const elapsed = lastFetch ? Date.now() - lastFetch : Infinity;
+    if(elapsed > 60000) fetchAllFixtures(); // re-fetch kalau sudah > 1 menit
+  }
+});
 
 // Refresh saat tab aktif lagi (dari background)
 document.addEventListener('visibilitychange', ()=>{
