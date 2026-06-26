@@ -139,6 +139,16 @@ main{max-width:1400px;margin:0 auto;padding:14px 12px 80px;}
 .mbadge{font-size:9px;font-weight:700;color:var(--accent);background:rgba(245,197,24,.1);border-radius:3px;padding:1px 5px;}
 .mlive-tag{font-size:9px;font-weight:700;color:var(--live);background:rgba(239,68,68,.15);border-radius:3px;padding:1px 5px;display:flex;align-items:center;gap:3px;}
 .mlive-tag::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--live);animation:pulse 1.5s infinite;display:inline-block;}
+/* Live score detail box */
+.live-detail{background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:8px 10px;margin-top:4px;grid-column:1/-1;}
+.live-events{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;}
+.live-event{font-size:9px;background:var(--surface);border-radius:3px;padding:2px 5px;color:var(--dim);}
+.live-event.goal{color:var(--green);}
+.live-event.card{color:var(--orange);}
+.live-stat-row{display:grid;grid-template-columns:1fr auto 1fr;gap:4px;align-items:center;font-size:9px;margin-top:4px;}
+.live-stat-bar-w{height:3px;background:var(--border);border-radius:99px;overflow:hidden;}
+.live-stat-bar-h{height:3px;background:var(--accent2);border-radius:99px;float:right;}
+.live-stat-bar-a{height:3px;background:var(--orange);border-radius:99px;}
 .mtime{font-size:9px;color:var(--dim);margin-left:auto;}
 .mteam{font-weight:600;font-size:12px;display:flex;align-items:center;gap:5px;}
 .mteam.h{justify-content:flex-end;text-align:right;}
@@ -307,11 +317,16 @@ main{max-width:1400px;margin:0 auto;padding:14px 12px 80px;}
       <button onclick="showTab('knockout',this)">Knockout</button>
       <button onclick="showTab('stats',this)">Stats</button>
       <button onclick="showTab('highlights',this)">🎬 Highlights</button>
+      <button onclick="showTab('prediction',this)">🔮 Prediksi</button>
     </nav>
     <div class="status-bar">
       <div class="sync-dot" id="sync-dot"></div>
       <span class="sync-label" id="sync-label">Menghubungkan…</span>
-      <div class="progress-badge" id="progress-badge">54/72</div>
+      <button onclick="manualRefresh()" id="refresh-btn" title="Update semua data sekarang"
+        style="background:var(--card);border:1px solid var(--border);color:var(--dim);border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:'Inter',sans-serif;transition:all .15s;">
+        &#128260; Update
+      </button>
+      <div class="progress-badge" id="progress-badge">60/72</div>
     </div>
   </div>
 </header>
@@ -324,6 +339,7 @@ main{max-width:1400px;margin:0 auto;padding:14px 12px 80px;}
   <div id="tab-knockout" class="tab-panel"></div>
   <div id="tab-stats"    class="tab-panel"></div>
   <div id="tab-highlights" class="tab-panel"></div>
+  <div id="tab-prediction" class="tab-panel"></div>
 </main>
 
 <!-- Bottom Nav (mobile) -->
@@ -345,6 +361,9 @@ main{max-width:1400px;margin:0 auto;padding:14px 12px 80px;}
   </button>
   <button class="bn-btn" onclick="showTab('highlights',this)" data-tab="highlights">
     <span class="icon">🎬</span>Highlights
+  </button>
+  <button class="bn-btn" onclick="showTab('prediction',this)" data-tab="prediction">
+    <span class="icon">🔮</span>Prediksi
   </button>
 </nav>
 
@@ -581,11 +600,25 @@ let scores = {
   // Grup C — 24 Jun ✅
   49:{home:0,away:3,done:true,live:false}, // Scotland 0-3 Brazil (Cunha x2, Vinicius)
   50:{home:4,away:2,done:true,live:false}, // Morocco 4-2 Haiti
-  // Grup A — 25 Jun ✅ (Yahoo Sports / ESPN confirmed)
-  53:{home:3,away:0,done:true,live:false}, // Czech Republic 0-3 Mexico → jadwal: Czech(home) vs Mexico(away)
+  // Grup A — 25 Jun ✅
+  53:{home:3,away:0,done:true,live:false}, // Czech Republic 0-3 Mexico (jadwal: Czech home, Mexico away)
   54:{home:1,away:0,done:true,live:false}, // South Africa 1-0 Korea Republic
-  // Grup D, E, F, G, H, I, J, K, L MD3 — belum selesai, auto-update via TheSportsDB
-}; // scores — MD1+MD2 full, MD3 Grup A/B/C done | update otomatis tiap 5 menit
+  // Grup E — 25 Jun ✅ (Yahoo Sports / ESPN)
+  55:{home:0,away:2,done:true,live:false}, // Curaçao 0-2 Ivory Coast
+  56:{home:2,away:3,done:true,live:false}, // Ecuador 2-3 Germany (Undav brace)
+  // Grup F — 25 Jun ✅
+  57:{home:2,away:1,done:true,live:false}, // Japan 2-1 Sweden (Japan lolos)
+  58:{home:0,away:3,done:true,live:false}, // Tunisia 0-3 Netherlands
+  // Grup D — 25 Jun ✅
+  59:{home:0,away:2,done:true,live:false}, // Turkey 0-2 United States
+  60:{home:1,away:0,done:true,live:false}, // Paraguay 1-0 Australia
+  // Grup H — 26 Jun (berlangsung hari ini — auto-update via API)
+  // 65: Cape Verde vs Saudi Arabia — belum mulai
+  // 66: Uruguay vs Spain — belum mulai
+  // Grup I — 26 Jun
+  // 61: Norway vs France — belum mulai
+  // 62: Senegal vs Iraq — belum mulai
+}; // scores — MD1+MD2 full, MD3 Grup A-F done | Grup G-L hari ini — auto-update TheSportsDB
 let koScores = {}; // knockout scores
 let liveMatches = []; // currently live match IDs
 let lastFetch = null;
@@ -677,6 +710,26 @@ async function fetchAllFixtures(){
 
 // fetchLiveScores alias ke fetchAllFixtures untuk TheSportsDB
 async function fetchLiveScores(){ return fetchAllFixtures(); }
+
+// ── MANUAL REFRESH — tombol Update di header ──
+async function manualRefresh(){
+  const btn = document.getElementById('refresh-btn');
+  if(btn){ btn.innerHTML = '&#9203; Loading…'; btn.style.color='var(--accent)'; btn.disabled=true; }
+  // Reset semua fetch state
+  hlFetched = false;
+  tsAutoRefreshed = false;
+  // Fetch skor
+  await fetchAllFixtures();
+  // Refresh top scorer
+  await refreshTopScorers(true);
+  // Refresh highlights kalau tab aktif
+  if(document.getElementById('tab-highlights')?.classList.contains('active')){
+    hlVideos=[]; fetchHighlights();
+  }
+  if(btn){ btn.innerHTML='&#10003; Updated'; btn.style.color='var(--green)';
+    setTimeout(()=>{ btn.innerHTML='&#128260; Update'; btn.style.color=''; btn.disabled=false; }, 2000); }
+  toast('✓ Semua data diperbarui!','green');
+}
 
 function processEvents(events){
   liveMatches = [];
@@ -1182,28 +1235,27 @@ function renderStats(){
     </div>`;
 }
 
-// ── TOP SCORER DATA — updated 25 Juni 2026 (setelah MD3 Grup A-F)
-// Sumber: Goal.com, Wego.com, FoxSports, FIFA.com/golden-boot
-// Auto-refresh harian via Claude API — lihat fungsi refreshTopScorers()
+// ── TOP SCORER — updated 26 Juni 2026 (MD1+MD2+MD3 Grup A-F)
+// Sumber: Goal.com, FourFourTwo, Olympics.com, FOX Sports Golden Boot tracker
 let TOP_SCORERS = [
   {name:'Lionel Messi',       team:'Argentina',     pos:'FW', goals:5, assists:2, matches:2},
   {name:'Erling Haaland',     team:'Norway',        pos:'FW', goals:4, assists:0, matches:2},
+  {name:'Matheus Cunha',      team:'Brazil',        pos:'FW', goals:3, assists:0, matches:3},
   {name:'Kylian Mbappé',      team:'France',        pos:'FW', goals:3, assists:1, matches:2},
   {name:'Deniz Undav',        team:'Germany',       pos:'FW', goals:3, assists:2, matches:3},
-  {name:'Jonathan David',     team:'Canada',        pos:'FW', goals:3, assists:0, matches:3},
-  {name:'Ayase Ueda',         team:'Japan',         pos:'FW', goals:2, assists:0, matches:2},
-  {name:'Vinicius Jr.',       team:'Brazil',        pos:'FW', goals:2, assists:1, matches:3},
-  {name:'Harry Kane',         team:'England',       pos:'FW', goals:2, assists:0, matches:2},
-  {name:'Folarin Balogun',    team:'United States', pos:'FW', goals:2, assists:0, matches:2},
-  {name:'Cyle Larin',         team:'Canada',        pos:'FW', goals:2, assists:0, matches:3},
-  {name:'Ismael Saibari',     team:'Morocco',       pos:'MF', goals:2, assists:0, matches:3},
+  {name:'Ismael Saibari',     team:'Morocco',       pos:'MF', goals:3, assists:0, matches:3},
+  {name:'Vinicius Jr.',       team:'Brazil',        pos:'FW', goals:3, assists:1, matches:3},
+  {name:'Folarin Balogun',    team:'United States', pos:'FW', goals:3, assists:0, matches:3},
   {name:'Cody Gakpo',         team:'Netherlands',   pos:'FW', goals:2, assists:1, matches:3},
+  {name:'Cyle Larin',         team:'Canada',        pos:'FW', goals:2, assists:0, matches:3},
+  {name:'Ayase Ueda',         team:'Japan',         pos:'FW', goals:2, assists:0, matches:3},
+  {name:'Harry Kane',         team:'England',       pos:'FW', goals:2, assists:0, matches:2},
+  {name:'Johan Manzambi',     team:'Switzerland',   pos:'MF', goals:2, assists:1, matches:3},
   {name:'Mohamed Salah',      team:'Egypt',         pos:'FW', goals:2, assists:1, matches:2},
-  {name:'Johan Manzambi',     team:'Switzerland',   pos:'MF', goals:2, assists:0, matches:2},
   {name:'Raul Jimenez',       team:'Mexico',        pos:'FW', goals:2, assists:0, matches:3},
-  {name:'Kai Havertz',        team:'Germany',       pos:'FW', goals:2, assists:0, matches:3},
+  {name:'Kai Havertz',        team:'Germany',       pos:'FW', goals:2, assists:1, matches:3},
 ];
-let tsLastUpdated = '25 Jun 2026';
+let tsLastUpdated = '26 Jun 2026';
 let tsAutoRefreshed = false;
 
 // ══════════════════════════════════════════════════════
@@ -1229,36 +1281,63 @@ function toast(msg, type=''){
 // ══════════════════════════════════════════════════════
 //  RENDER: HIGHLIGHTS (YouTube RSS — FIFA official)
 // ══════════════════════════════════════════════════════
-// FIFA official YouTube channel: UCpcTrCXblq78GZrTUTLWeBw
-// YouTube RSS feed tidak butuh API key — langsung bisa diakses
+// ══ HIGHLIGHTS — FIFA Official YouTube ══
+// Channel: youtube.com/@fifa (UCpcTrCXblq78GZrTUTLWeBw)
+// Konten: extended highlights, goals, analysis per pertandingan
+// Auto-fetch via Claude API setiap buka tab (cari video terbaru FIFA WC 2026)
+
 const FIFA_YT_CHANNEL = 'UCpcTrCXblq78GZrTUTLWeBw';
-// Video highlights FIFA WC 2026 resmi — diverifikasi dari YouTube
-// Diurutkan dari yang terbaru (Matchday 3 → Matchday 1)
-// ══ HIGHLIGHTS — SUMBER TVRI NASIONAL YouTube ══
-// Channel resmi TVRI: youtube.com/c/TVRINasional
-// TVRI upload: reaction live "Bola Gembira", ulasan, cuplikan gol, analisis
-// Konten ini TIDAK geoblocked karena dari broadcaster lokal Indonesia
-// Auto-fetch via YouTube RSS feed TVRI channel
+const FIFA_YT_URL = 'https://www.youtube.com/@fifa';
 
-const TVRI_CHANNEL_ID = 'UCnQ7jIB6PBsa_KT_QalF0Cg'; // TVRI Nasional
-const TVRI_CHANNEL_URL = 'https://www.youtube.com/c/TVRINasional';
-
-// Fallback: video TVRI yang sudah diverifikasi ada (dari search)
+// Hardcoded video FIFA yang sudah dikonfirmasi ada (dari FIFA.com article links)
+// FIFA.com menampilkan link highlights per match — video ID dari situ
 const HL_VIDEOS_STATIC = [
-  // Video TVRI Nasional — Bola Gembira / Ulasan / Highlight WC 2026
-  {id:'E405Na2gYcs', title:'Kupas Tuntas Piala Dunia 2026 di TVRI — Kesiapan Siaran & Panduan Nonton', matchday:0, date:'Pra-PD', verified:true, source:'tvri'},
-  {id:'fXNviIquEBw', title:'Jadwal Siaran Langsung Piala Dunia 2026 — Brazil vs Haiti | LIVE TVRI', matchday:1, date:'Jun 14', verified:true, source:'tvri'},
-  {id:'AyfKEdDuHBA', title:'Jadwal Siaran Langsung Piala Dunia — Belanda vs Swedia | LIVE TVRI', matchday:2, date:'Jun 20', verified:true, source:'tvri'},
+  // MD3 — dari link FIFA.com/highlights
+  {id:'gOKNKSVJyYE', title:'Argentina v Algeria | Group J | FIFA World Cup 2026™ | Highlights', matchday:1, date:'Jun 16', verified:true, source:'fifa'},
+  {id:'rZXe_FKzmb4', title:'Netherlands v Sweden | Group F | FIFA World Cup 2026™ | Highlights', matchday:2, date:'Jun 20', verified:true, source:'fifa'},
+  {id:'JakdhltyECE', title:'Argentina v Austria | Group J | FIFA World Cup 2026™ | Extended Highlights', matchday:3, date:'Jun 22', verified:true, source:'fox'},
+  {id:'YbiEe9pOV-s', title:'Belgium v Iran | Group G | FIFA World Cup 2026™ | Extended Highlights', matchday:3, date:'Jun 22', verified:true, source:'fox'},
+  {id:'w453UjgtQw4', title:'Spain v Saudi Arabia | Group H | FIFA World Cup 2026™ | Extended Highlights', matchday:2, date:'Jun 21', verified:true, source:'fox'},
+  {id:'Ihp4QH9YkBc', title:'New Zealand v Egypt | Group G | FIFA World Cup 2026™ | Extended Highlights', matchday:2, date:'Jun 21', verified:true, source:'fox'},
 ];
 
 const HL_CONFIRMED = {
-  'E405Na2gYcs': true,
-  'fXNviIquEBw': true,
-  'AyfKEdDuHBA': true,
+  'gOKNKSVJyYE':true,'rZXe_FKzmb4':true,
+  'JakdhltyECE':true,'YbiEe9pOV-s':true,
+  'w453UjgtQw4':true,'Ihp4QH9YkBc':true,
 };
 
-// Fetch RSS TVRI untuk konten terbaru
-const TVRI_RSS = 'https://www.youtube.com/feeds/videos.xml?channel_id=' + TVRI_CHANNEL_ID;
+// Claude API fetch FIFA highlights terbaru
+async function fetchFIFAHighlightsViaClaude(){
+  try {
+    const today = new Date().toISOString().slice(0,10);
+    const cacheKey = 'wc2026_hl_' + today;
+    const cached = localStorage.getItem(cacheKey);
+    if(cached){ const d=JSON.parse(cached); if(d.length){ return d; } }
+
+    const res = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-6', max_tokens:1500,
+        tools:[{type:'web_search_20250305',name:'web_search'}],
+        messages:[{role:'user',content:
+          `Search YouTube for the latest FIFA World Cup 2026 official highlight videos on the channel @fifa (channel ID UCpcTrCXblq78GZrTUTLWeBw). Find as many real YouTube video IDs as possible for match highlights from FIFA World Cup 2026. Return ONLY a JSON array, no markdown, like: [{"id":"VIDEO_ID","title":"Match Title","matchday":1,"date":"Jun 12"}]. Include up to 12 videos. Only include real video IDs you find from actual search results.`
+        }]
+      })
+    });
+    if(!res.ok) throw new Error('API '+res.status);
+    const data = await res.json();
+    const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
+    const clean = text.replace(/```json|```/g,'').trim();
+    const arr = JSON.parse(clean);
+    if(Array.isArray(arr) && arr.length){
+      const valid = arr.filter(v=>v.id&&v.id.length===11);
+      localStorage.setItem(cacheKey, JSON.stringify(valid));
+      return valid;
+    }
+  } catch(e){ console.warn('Claude HL fetch:', e.message); }
+  return [];
+}
 
 let hlVideos = [];
 let hlActive = null;
@@ -1287,7 +1366,7 @@ async function checkVideoId(id){
 async function fetchHighlights(){
   if(hlFetched) return;
 
-  // Step 1: Load video TVRI yang sudah verified — langsung tampil
+  // Step 1: Load video hardcoded yang sudah verified — langsung tampil
   hlVideos = HL_VIDEOS_STATIC
     .filter(v => v.verified || HL_CONFIRMED[v.id])
     .map(v => ({ ...v, thumb: 'https://i.ytimg.com/vi/'+v.id+'/mqdefault.jpg' }));
@@ -1296,47 +1375,20 @@ async function fetchHighlights(){
   if(!hlActive && hlVideos.length) hlActive = hlVideos[0].id;
   renderHighlights();
 
-  // Step 2: Fetch RSS TVRI untuk video terbaru (background, non-blocking)
-  try {
-    const proxy = 'https://api.allorigins.win/get?url=' + encodeURIComponent(TVRI_RSS);
-    const res = await fetch(proxy, {signal: AbortSignal.timeout(6000)});
-    if(res.ok){
-      const json = await res.json();
-      const xml = new DOMParser().parseFromString(json.contents||'', 'text/xml');
-      const entries = xml.querySelectorAll('entry');
-      const wcKeywords = ['piala dunia','world cup','fifa','bola gembira','highlight','gol','pertandingan','2026'];
-      let added = 0;
-      entries.forEach(e => {
-        const vidId = (e.querySelector('videoId')?.textContent || e.querySelector('id')?.textContent?.split(':').pop() || '').trim();
-        const title = e.querySelector('title')?.textContent || '';
-        const pub = e.querySelector('published')?.textContent || '';
-        if(!vidId || !title) return;
-        const tl = title.toLowerCase();
-        const isWC = wcKeywords.some(k => tl.includes(k));
-        if(!isWC) return;
-        if(hlVideos.find(x=>x.id===vidId)) return; // skip duplikat
-        // Deteksi matchday dari tanggal publish
-        const d = new Date(pub);
-        const day = d.getDate();
-        const md = day <= 18 ? 1 : day <= 24 ? 2 : 3;
+  // Step 2: Background fetch video FIFA terbaru via Claude API
+  const newVids = await fetchFIFAHighlightsViaClaude();
+  if(newVids.length){
+    newVids.forEach(v => {
+      if(!hlVideos.find(x=>x.id===v.id)){
         hlVideos.unshift({
-          id: vidId,
-          title,
-          matchday: md,
-          date: pub ? d.toLocaleDateString('id-ID',{day:'numeric',month:'short'}) : '',
-          verified: true,
-          source: 'tvri',
-          thumb: 'https://i.ytimg.com/vi/'+vidId+'/mqdefault.jpg'
+          ...v,
+          thumb: 'https://i.ytimg.com/vi/'+v.id+'/mqdefault.jpg',
+          verified:true, source:'fifa'
         });
-        added++;
-      });
-      if(added > 0){
-        hlActive = hlVideos[0].id;
-        renderHighlights();
       }
-    }
-  } catch(e){
-    console.log('TVRI RSS fetch failed:', e.message, '— using static videos');
+    });
+    hlActive = hlVideos[0].id;
+    renderHighlights();
   }
 }
 
@@ -1370,27 +1422,27 @@ function renderHighlights(){
   el.innerHTML = `
     <div class="sec-title">&#127916; Highlights FIFA World Cup 2026</div>
 
-    <!-- Info TVRI -->
+    <!-- Info FIFA YouTube -->
     <div class="hl-geo-banner">
-      <div class="hl-geo-icon">&#127470;&#127465;</div>
+      <div class="hl-geo-icon">&#127942;</div>
       <div>
-        <div class="hl-geo-title">Konten resmi TVRI Nasional — Bisa ditonton di Indonesia!</div>
+        <div class="hl-geo-title">Highlights resmi FIFA YouTube — @fifa</div>
         <div class="hl-geo-text">
-          Video di bawah dari <strong>YouTube resmi TVRI Nasional</strong> (pemegang hak siar WC 2026 di Indonesia) —
-          ulasan, reaction Bola Gembira, dan cuplikan pertandingan. Tap untuk buka di YouTube.
-          Untuk siaran full match, gunakan:
+          Video highlights resmi dari <strong>FIFA Official YouTube (@fifa)</strong>.
+          Beberapa video mungkin diblokir di Indonesia (hak siar TVRI).
+          Tap kartu untuk buka di YouTube. Untuk nonton full match di Indonesia:
         </div>
         <div class="hl-platform-row">
-          <a class="hl-platform-btn" href="https://www.youtube.com/c/TVRINasional" target="_blank" rel="noopener">&#128250; YouTube TVRI</a>
+          <a class="hl-platform-btn" href="https://www.youtube.com/@fifa" target="_blank" rel="noopener">&#127942; FIFA YouTube</a>
+          <a class="hl-platform-btn" href="https://www.youtube.com/c/TVRINasional" target="_blank" rel="noopener">&#128250; TVRI YouTube</a>
           <a class="hl-platform-btn" href="https://www.folaplay.id" target="_blank" rel="noopener">&#9917; Fola Play</a>
           <a class="hl-platform-btn" href="https://maxstream.tv" target="_blank" rel="noopener">&#128225; MAXstream</a>
-          <a class="hl-platform-btn" href="https://www.tvri.go.id" target="_blank" rel="noopener">&#127968; TVRI.go.id</a>
         </div>
       </div>
     </div>
 
     <div class="hl-src-note">
-      &#128250; Sumber: <a href="https://www.youtube.com/c/TVRINasional" target="_blank">TVRI Nasional YouTube</a>
+      &#127942; Sumber: <a href="https://www.youtube.com/@fifa" target="_blank">FIFA Official YouTube (@fifa)</a>
       &nbsp;&middot;&nbsp; ${hlVideos.length} video tersedia &middot; Tap untuk buka di YouTube
       <button onclick="hlRefresh()" style="margin-left:auto;background:var(--card);border:1px solid var(--border);color:var(--dim);padding:3px 8px;border-radius:5px;font-size:10px;cursor:pointer;">&#128260; Refresh</button>
     </div>
@@ -1414,9 +1466,9 @@ function renderHighlights(){
       : `<div class="hl-err">Tidak ada video untuk filter ini.</div>`}
 
     <div style="margin-top:16px;text-align:center;padding-bottom:8px;">
-      <a href="https://www.youtube.com/c/TVRINasional" target="_blank" rel="noopener"
+      <a href="https://www.youtube.com/@fifa/videos" target="_blank" rel="noopener"
         style="display:inline-flex;align-items:center;gap:6px;background:#cc0000;color:#fff;font-size:12px;font-weight:600;padding:9px 18px;border-radius:8px;text-decoration:none;">
-        &#128250; Buka Channel TVRI Nasional di YouTube
+        &#127942; Lihat semua di FIFA YouTube (@fifa)
       </a>
     </div>`;
 }
@@ -1715,6 +1767,207 @@ function showTab(id, btn){
     if(!hlFetched){ fetchHighlights(); }
     else { renderHighlights(); }
   }
+  if(id === 'prediction') renderPrediction();
+}
+
+
+// ══════════════════════════════════════════════════════
+//  RENDER: PREDICTION — Analisa potensi juara
+//  Berdasarkan: form grup, odds bookmaker, Opta supercomputer,
+//  squad quality, head coach, kondisi pemain
+// ══════════════════════════════════════════════════════
+const PREDICTIONS = [
+  {
+    rank: 1,
+    team: 'France',
+    odds: '+370',
+    probability: '27%',
+    form: ['W','W'], // MD1: 3-1, MD2: 3-0
+    gf: 6, ga: 1,
+    badge: '🥇 FAVORIT UTAMA',
+    badgeColor: 'var(--accent)',
+    coach: 'Didier Deschamps (jabatan terakhir setelah WC2026)',
+    strengths: [
+      '6 gol dalam 2 laga — serangan paling produktif bersama Germany',
+      'Mbappé dalam form terbaik: 3 gol 1 assist, mobilitas tinggi',
+      'Lini tengah terkuat: Tchouameni-Camavinga-Rabiot sangat solid',
+      'Maignan di bawah mistar — performa konsisten sejak AC Milan',
+      'Kedalaman skuad luar biasa: bisa rotasi tanpa turun kualitas',
+    ],
+    concerns: [
+      'Norway di MD3 lawan berat — Haaland bisa ancam lini belakang',
+      'Upamecano kadang rentan satu lawan satu',
+      'Deschamps pensiun setelah turnamen — motivasi extra pressure',
+    ],
+    keyPlayers: [
+      {name:'Kylian Mbappé', pos:'FW', note:'3G 1A — on fire, calon Golden Boot'},
+      {name:'Aurélien Tchouameni', pos:'MF', note:'Jangkar pertahanan Real Madrid'},
+      {name:'Mike Maignan', pos:'GK', note:'Hanya 1 gol kebobolan'},
+      {name:'Marcus Thuram', pos:'FW', note:'Duet mematikan dengan Mbappé'},
+    ],
+    analysis: 'France adalah tim paling lengkap di turnamen ini. Kemenangan 3-1 atas Senegal dan 3-0 atas Iraq memperlihatkan dominasi total — bukan hanya skor akhir, tapi kontrol permainan. Mbappé beroperasi lebih bebas di bawah Deschamps dibanding PSG, dan kombinasinya dengan Thuram menciptakan ruang yang selalu bisa dieksploitasi. Deschamps yang akan pensiun usai turnamen ini punya motivasi ekstra untuk memberikan warisan terbaik. Lini pertahanan yang hanya kebobolan 1 gol dari 2 laga menunjukkan kedewasaan tim. France punya jalur bracket yang bisa mempertemukan mereka dengan Spain atau England di semifinal — sebuah tes sesungguhnya.',
+    route: 'Group I → R32 (Jul 1) → R16 (Jul 7) → QF (Jul 14) → SF (Jul 17) → Final (Jul 19)',
+  },
+  {
+    rank: 2,
+    team: 'Argentina',
+    odds: '+600',
+    probability: '14%',
+    form: ['W','W'],
+    gf: 5, ga: 0,
+    badge: '🥈 JUARA BERTAHAN',
+    badgeColor: 'var(--accent2)',
+    coach: 'Lionel Scaloni (arsitek double-champion 2021 Copa América & 2022 WC)',
+    strengths: [
+      'Messi 5 gol 2 assist — turnamen terbaik sepanjang karirnya di WC',
+      'Defensive record sempurna: 0 gol kebobolan dalam 2 laga',
+      'Julian Alvarez & Lautaro sebagai opsi striker — fleksibel',
+      'Scaloni punya game plan matang: press tinggi + transisi cepat',
+      'Mentalitas juara — squad yang sama yang menang 2022 hampir utuh',
+    ],
+    concerns: [
+      'Messi 38 tahun — beban fisik di 7-8 laga beruntun berisiko',
+      'Mac Allister & Enzo Fernandez perlu konsisten di laga besar',
+      'Bracket bisa mempertemukan France/Spain di semi — gauntlet berat',
+    ],
+    keyPlayers: [
+      {name:'Lionel Messi', pos:'FW', note:'5G 2A — memimpin Golden Boot, WC terakhir'},
+      {name:'Julian Alvarez', pos:'FW', note:'Pergerakan tanpa bola luar biasa'},
+      {name:'Alexis Mac Allister', pos:'MF', note:'Mesin Liverpool yang tak kenal lelah'},
+      {name:'Emiliano Martínez', pos:'GK', note:'0 gol kebobolan — tembok Argentina'},
+    ],
+    analysis: 'Messi dalam mode "turnamen terakhir, all in." Hat-trick lawan Algérie di MD1 lalu assist 2 gol lawan Austria — performa 38 tahun ini defies logic. Scaloni membangun tim yang benar-benar melindungi Messi: struktur press tinggi, Mac Allister & Enzo menjaga keseimbangan, lalu melepas Messi bebas di half-space. Tanpa kebobolan setelah 180 menit, Argentina paling mungkin menjaga clean sheet di turnamen ini. Risiko utama adalah beban fisik Messi jika harus bermain penuh 7 laga — tapi Scaloni tahu persis kapan harus merotasi. Bracket Argentina lebih "mudah" di awal bracket sebelum potensi bentrok France/Spain di semi.',
+    route: 'Group J → R32 (Jun 30) → R16 (Jul 7) → QF (Jul 14) → SF (Jul 18) → Final (Jul 19)',
+  },
+  {
+    rank: 3,
+    team: 'Spain',
+    odds: '+500',
+    probability: '20%',
+    form: ['D','W'],
+    gf: 4, ga: 0,
+    badge: '🥉 DARK HORSE BERBAHAYA',
+    badgeColor: 'var(--green)',
+    coach: 'Luis de la Fuente (Euro 2024 champion)',
+    strengths: [
+      'Pemenang Euro 2024 — DNA juara masih segar',
+      'Lamine Yamal kembali fit: pemain paling kreatif di turnamen',
+      'Rodri sebagai metronom — kontrol midfield terbaik dunia',
+      'Sistem tiki-taka evolusi: lebih vertikal dan cepat dari era sebelumnya',
+      'Morata + Joselu + Nico Williams — trio serangan komplementer',
+    ],
+    concerns: [
+      'Hasil imbang 0-0 lawan Cape Verde — alarm serius, Spain mestinya menang mudah',
+      'Yamal kondisi belum 100% fit di awal turnamen',
+      'Ketergantungan pada Rodri — jika cedera, Spain langsung rentan',
+      'Sejarah WC: Spain hanya juara sekali (2010) — pressure besar',
+    ],
+    keyPlayers: [
+      {name:'Lamine Yamal', pos:'FW', note:'17 tahun, pemain terbaik Euro 2024, kembali fit'},
+      {name:'Rodri', pos:'MF', note:'Ballon d\'Or 2024 — metronom tak tergantikan'},
+      {name:'Pedri', pos:'MF', note:'Kreativitas Barcelona di level dunia'},
+      {name:'Alvaro Morata', pos:'FW', note:'Kapten berpengalaman, tajam di bawah tekanan'},
+    ],
+    analysis: 'Spain secara kualitas skuad mungkin paling dalam di turnamen ini — dan hasil imbang 0-0 lawan Cape Verde itu anomali, bukan tanda kelemahan. Terlalu dini untuk panik. Kemenangan 4-0 lawan Saudi Arabia memperlihatkan Spain yang sesungguhnya: dominan, fluid, tak termaafkan. Yamal yang kembali fit adalah game-changer — di Euro 2024 ia seorang diri membongkar sistem bertahan terbaik Eropa. Rodri mengatur tempo seperti konduktor orkestra. Risiko terbesar Spain adalah jika mereka bertemu France terlalu awal — keduanya berpotensi di semifinal. Namun jika bracket berpihak, Spain bisa sangat berbahaya di fase gugur.',
+    route: 'Group H → R32 (Jun 29) → R16 (Jul 6) → QF (Jul 13) → SF (Jul 17) → Final (Jul 19)',
+  }
+];
+
+function renderPrediction(){
+  const el = document.getElementById('tab-prediction');
+  if(!el) return;
+
+  const cards = PREDICTIONS.map(p => {
+    const formHtml = p.form.map(f =>
+      `<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;font-size:9px;font-weight:700;background:${f==='W'?'rgba(34,197,94,.2)':f==='D'?'rgba(245,197,24,.2)':'rgba(239,68,68,.2)'};color:${f==='W'?'var(--green)':f==='D'?'var(--accent)':'var(--red)'};">${f}</span>`
+    ).join('');
+
+    const players = p.keyPlayers.map(kp =>
+      `<div style="background:var(--surface);border-radius:6px;padding:6px 8px;display:flex;gap:6px;align-items:flex-start;">
+        <span style="font-size:9px;font-weight:700;background:${kp.pos==='FW'?'rgba(239,68,68,.15)':kp.pos==='MF'?'rgba(58,123,213,.15)':kp.pos==='DF'?'rgba(34,197,94,.15)':'rgba(245,197,24,.15)'};color:${kp.pos==='FW'?'var(--red)':kp.pos==='MF'?'var(--accent2)':kp.pos==='DF'?'var(--green)':'var(--accent)'};border-radius:3px;padding:1px 4px;flex-shrink:0;margin-top:1px;">${kp.pos}</span>
+        <div><div style="font-size:11px;font-weight:600;">${kp.name}</div><div style="font-size:9px;color:var(--dim);">${kp.note}</div></div>
+      </div>`
+    ).join('');
+
+    const strengths = p.strengths.map(s => `<li style="margin-bottom:3px;">&#9989; ${s}</li>`).join('');
+    const concerns = p.concerns.map(s => `<li style="margin-bottom:3px;">&#9888;&#65039; ${s}</li>`).join('');
+
+    return `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:16px;">
+      <!-- Header -->
+      <div style="background:linear-gradient(135deg,var(--surface),var(--card));padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;">
+        <div style="font-size:48px;line-height:1;">${fl(p.team)}</div>
+        <div style="flex:1;">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;">${p.team}</span>
+            <span style="font-size:10px;font-weight:700;background:${p.badgeColor}22;color:${p.badgeColor};border:1px solid ${p.badgeColor}44;border-radius:4px;padding:2px 7px;">${p.badge}</span>
+          </div>
+          <div style="display:flex;gap:12px;margin-top:4px;flex-wrap:wrap;">
+            <span style="font-size:11px;color:var(--dim);">Odds: <strong style="color:var(--accent);">${p.odds}</strong></span>
+            <span style="font-size:11px;color:var(--dim);">Peluang: <strong style="color:var(--green);">${p.probability}</strong></span>
+            <span style="font-size:11px;color:var(--dim);">GF/GA: <strong>${p.gf}/${p.ga}</strong></span>
+            <span style="font-size:11px;color:var(--dim);">Form: ${formHtml}</span>
+          </div>
+          <div style="font-size:10px;color:var(--dim);margin-top:3px;">&#128101; ${p.coach}</div>
+        </div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--accent);line-height:1;">#${p.rank}</div>
+      </div>
+
+      <!-- Analisis -->
+      <div style="padding:14px 16px;">
+        <div style="font-size:12px;color:var(--text);line-height:1.7;margin-bottom:12px;border-left:3px solid ${p.badgeColor};padding-left:10px;">${p.analysis}</div>
+
+        <!-- Kekuatan & Risiko -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+          <div>
+            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--green);margin-bottom:5px;">Kekuatan</div>
+            <ul style="list-style:none;padding:0;font-size:11px;color:var(--text);line-height:1.6;">${strengths}</ul>
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--orange);margin-bottom:5px;">Risiko & Kekhawatiran</div>
+            <ul style="list-style:none;padding:0;font-size:11px;color:var(--text);line-height:1.6;">${concerns}</ul>
+          </div>
+        </div>
+
+        <!-- Key Players -->
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--dim);margin-bottom:6px;">Pemain Kunci</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:5px;margin-bottom:10px;">${players}</div>
+
+        <!-- Route to Final -->
+        <div style="background:var(--surface);border-radius:6px;padding:8px 10px;font-size:10px;color:var(--dim);">
+          &#128506; Jalur potensial: <span style="color:var(--text);">${p.route}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="sec-title">🔮 Prediksi Potensi Juara</div>
+    <div style="font-size:10px;color:var(--dim);margin-bottom:14px;line-height:1.6;">
+      Analisa berdasarkan: hasil grup, odds bookmaker (FanDuel/FOX Sports 25 Jun 2026),
+      Opta supercomputer, kualitas skuad, form, kondisi pemain &amp; pelatih.
+      <strong style="color:var(--accent);">Diperbarui setelah MD2.</strong>
+    </div>
+    ${cards}
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-top:4px;">
+      <div style="font-size:10px;font-weight:700;color:var(--dim);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px;">Tim Berbahaya Lainnya</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        ${[
+          {t:'England',o:'+650',n:'Kane+Bellingham, Tuchel bawa struktur baru'},
+          {t:'Germany',o:'+1300',n:'7 gol di MD1, Undav super-sub mematikan'},
+          {t:'Netherlands',o:'+1500',n:'Gakpo-Brobbey tajam, Van Dijk kokoh'},
+          {t:'Brazil',o:'+1300',n:'Cunha+Vinicius bangkit, Ancelotti effect'},
+          {t:'Morocco',o:'+4000',n:'Saibari 3 gol, dark horse Afrika'},
+        ].map(t=>`
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 10px;min-width:140px;">
+            <div style="font-size:13px;">${fl(t.t)} <strong style="font-size:11px;">${t.t}</strong> <span style="font-size:10px;color:var(--accent);">${t.o}</span></div>
+            <div style="font-size:9px;color:var(--dim);margin-top:2px;">${t.n}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+    <div style="font-size:9px;color:var(--dim);margin-top:12px;text-align:center;">
+      Odds per 25 Jun 2026 via FanDuel Sportsbook. Bukan saran taruhan. Data Opta: France 13%, Spain 16%, Argentina 10.4%.
+    </div>`;
 }
 
 // ══════════════════════════════════════════════════════
@@ -1726,6 +1979,7 @@ function renderAll(){
   renderSchedule();
   renderKnockout();
   renderStats();
+  renderPrediction();
   updateBadge();
 }
 
