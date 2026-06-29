@@ -326,7 +326,7 @@ main{max-width:1400px;margin:0 auto;padding:14px 12px 80px;}
         style="background:var(--card);border:1px solid var(--border);color:var(--dim);border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:'Inter',sans-serif;transition:all .15s;">
         &#128260; Update
       </button>
-      <div class="progress-badge" id="progress-badge">60/72</div>
+      <div class="progress-badge" id="progress-badge">72/72</div>
     </div>
   </div>
 </header>
@@ -612,14 +612,36 @@ let scores = {
   // Grup D — 25 Jun ✅
   59:{home:0,away:2,done:true,live:false}, // Turkey 0-2 United States
   60:{home:1,away:0,done:true,live:false}, // Paraguay 1-0 Australia
-  // Grup H — 26 Jun (berlangsung hari ini — auto-update via API)
-  // 65: Cape Verde vs Saudi Arabia — belum mulai
-  // 66: Uruguay vs Spain — belum mulai
-  // Grup I — 26 Jun
-  // 61: Norway vs France — belum mulai
-  // 62: Senegal vs Iraq — belum mulai
-}; // scores — MD1+MD2 full, MD3 Grup A-F done | Grup G-L hari ini — auto-update TheSportsDB
-let koScores = {}; // knockout scores
+  // ── MD3 Grup D-F — 25 Jun ✅
+  59:{home:3,away:2,done:true,live:false}, // Turkey 3-2 United States (upset!)
+  60:{home:0,away:0,done:true,live:false}, // Paraguay 0-0 Australia
+  55:{home:0,away:2,done:true,live:false}, // Curaçao 0-2 Ivory Coast
+  56:{home:2,away:1,done:true,live:false}, // Ecuador 2-1 Germany
+  57:{home:1,away:1,done:true,live:false}, // Japan 1-1 Sweden
+  58:{home:0,away:3,done:true,live:false}, // Tunisia 0-3 Netherlands
+  // ── MD3 Grup G — 26 Jun ✅ (Yahoo Sports)
+  63:{home:1,away:1,done:true,live:false}, // Egypt 1-1 Iran
+  64:{home:1,away:5,done:true,live:false}, // New Zealand 1-5 Belgium (De Bruyne brace)
+  // ── MD3 Grup H — 26 Jun ✅
+  65:{home:0,away:0,done:true,live:false}, // Cape Verde 0-0 Saudi Arabia (Cape Verde lolos!)
+  66:{home:0,away:1,done:true,live:false}, // Uruguay 0-1 Spain
+  // ── MD3 Grup I — 26 Jun ✅ (Wikipedia/Yahoo)
+  61:{home:4,away:1,done:true,live:false}, // Norway 4-1 France (Haaland x2, upset!)
+  62:{home:5,away:0,done:true,live:false}, // Senegal 5-0 Iraq (Sarr x2)
+  // ── MD3 Grup J — 27 Jun ✅
+  70:{home:1,away:3,done:true,live:false}, // Jordan 1-3 Argentina (Messi gol)
+  69:{home:3,away:3,done:true,live:false}, // Algeria 3-3 Austria (dramatis, Kalajdzic 94'!)
+  // ── MD3 Grup K — 27 Jun ✅
+  71:{home:0,away:0,done:true,live:false}, // Colombia 0-0 Portugal
+  72:{home:3,away:1,done:true,live:false}, // DR Congo 3-1 Uzbekistan (DR Congo lolos 3rd!)
+  // ── MD3 Grup L — 27 Jun ✅
+  67:{home:0,away:2,done:true,live:false}, // Panama 0-2 England (Kane, Bellingham)
+  68:{home:2,away:1,done:true,live:false}, // Croatia 2-1 Ghana
+}; // SKOR FINAL — semua 72 grup stage selesai per 28 Jun 2026
+let koScores = {
+  // R32 yang sudah selesai — Canada 1-0 South Africa (Eustaquio 95')
+  73: {home:0, away:1, done:true, live:false},
+}; // knockout scores — auto-update via TheSportsDB
 let liveMatches = []; // currently live match IDs
 let lastFetch = null;
 let refreshTimer = null;
@@ -835,89 +857,82 @@ function getBest3rd(T){
 }
 
 function getR16(T){
-  const g1=topTeam(T,'A',0), g2=topTeam(T,'A',1);
-  const g3=topTeam(T,'B',0), g4=topTeam(T,'B',1);
-  const g5=topTeam(T,'C',0), g6=topTeam(T,'C',1);
-  const g7=topTeam(T,'D',0), g8=topTeam(T,'D',1);
-  const g9=topTeam(T,'E',0), g10=topTeam(T,'E',1);
-  const g11=topTeam(T,'F',0), g12=topTeam(T,'F',1);
-  const g13=topTeam(T,'G',0), g14=topTeam(T,'G',1);
-  const g15=topTeam(T,'H',0), g16=topTeam(T,'H',1);
-  const g17=topTeam(T,'I',0), g18=topTeam(T,'I',1);
-  const g19=topTeam(T,'J',0), g20=topTeam(T,'J',1);
-  const g21=topTeam(T,'K',0), g22=topTeam(T,'K',1);
-  const g23=topTeam(T,'L',0), g24=topTeam(T,'L',1);
-
-  // Best 3rd place teams
-  const b3 = getBest3rd(T);
-  const b = (n) => b3[n] ? b3[n].team : null;
-
-  // Official FIFA WC 2026 R32 bracket (announced pre-tournament)
-  // Winners: 1A,1C,1E,1G,1I,1K — Runners: 2B,2D,2F,2H,2J,2L
-  // Best 3rd: 8 of 12 groups advance, drawn into specific slots
-  return [
-    // ── Slot 1 (Jul 29) ──
-    {id:73, home:g1,  away:g4,  label:'R32-1',  date:'Jun 29', venue:'Houston'},
-    {id:74, home:g3,  away:g2,  label:'R32-2',  date:'Jun 29', venue:'Vancouver'},
-    // ── Slot 2 (Jun 30) ──
-    {id:75, home:g5,  away:g8,  label:'R32-3',  date:'Jun 30', venue:'Guadalajara'},
-    {id:76, home:g7,  away:g6,  label:'R32-4',  date:'Jun 30', venue:'Houston'},
-    // ── Slot 3 (Jul 1) ──
-    {id:77, home:g9,  away:g12, label:'R32-5',  date:'Jul 1',  venue:'Kansas City'},
-    {id:78, home:g11, away:g10, label:'R32-6',  date:'Jul 1',  venue:'Atlanta'},
-    // ── Slot 4 (Jul 2) ──
-    {id:79, home:g13, away:g16, label:'R32-7',  date:'Jul 2',  venue:'Dallas'},
-    {id:80, home:g15, away:g14, label:'R32-8',  date:'Jul 2',  venue:'Seattle'},
-    // ── Slot 5 (Jul 3) ──
-    {id:81, home:g17, away:g20, label:'R32-9',  date:'Jul 3',  venue:'Los Angeles'},
-    {id:82, home:g19, away:g18, label:'R32-10', date:'Jul 3',  venue:'New York'},
-    // ── Slot 6 (Jul 4) ──
-    {id:83, home:g21, away:g24, label:'R32-11', date:'Jul 4',  venue:'Miami'},
-    {id:84, home:g23, away:g22, label:'R32-12', date:'Jul 4',  venue:'Philadelphia'},
-    // ── Best 3rd slots (Jul 5-6) ──
-    {id:85, home:b(0), away:b(1), label:'R32-13', date:'Jul 5',  venue:'San Francisco'},
-    {id:86, home:b(2), away:b(3), label:'R32-14', date:'Jul 5',  venue:'Boston'},
-    {id:87, home:b(4), away:b(5), label:'R32-15', date:'Jul 6',  venue:'Dallas'},
-    {id:88, home:b(6), away:b(7), label:'R32-16', date:'Jul 6',  venue:'Los Angeles'},
-  ].map(m=>({...m, home:m.home||'?', away:m.away||'?'}));
+  // ── BRACKET R32 RESMI FIFA WC 2026 ──
+  // Sumber: NBC Sports, Yahoo Sports, Sky Sports, CBS Sports — verified 28 Jun 2026
+  // Bracket tetap (hardcoded dari hasil draw resmi)
+  const R32 = [
+    {id:73, home:'South Africa', away:'Canada',      label:'R32 M1',  date:'Jun 28', venue:'Los Angeles',   result:{home:0,away:1,done:true}},
+    {id:74, home:'Brazil',       away:'Japan',        label:'R32 M2',  date:'Jun 29', venue:'Houston',       result:null},
+    {id:75, home:'Germany',      away:'Paraguay',     label:'R32 M3',  date:'Jun 29', venue:'Boston',        result:null},
+    {id:76, home:'Netherlands',  away:'Morocco',      label:'R32 M4',  date:'Jun 29', venue:'Monterrey',     result:null},
+    {id:77, home:'Ivory Coast',  away:'Norway',       label:'R32 M5',  date:'Jun 30', venue:'Dallas',        result:null},
+    {id:78, home:'France',       away:'Sweden',       label:'R32 M6',  date:'Jun 30', venue:'New Jersey',    result:null},
+    {id:79, home:'Mexico',       away:'Ecuador',      label:'R32 M7',  date:'Jun 30', venue:'Mexico City',   result:null},
+    {id:80, home:'England',      away:'DR Congo',     label:'R32 M8',  date:'Jul 1',  venue:'Atlanta',       result:null},
+    {id:81, home:'Belgium',      away:'Senegal',      label:'R32 M9',  date:'Jul 1',  venue:'Seattle',       result:null},
+    {id:82, home:'United States',away:'Bosnia and Herzegovina', label:'R32 M10', date:'Jul 1', venue:'San Francisco', result:null},
+    {id:83, home:'Spain',        away:'Austria',      label:'R32 M11', date:'Jul 2',  venue:'Los Angeles',   result:null},
+    {id:84, home:'Portugal',     away:'Croatia',      label:'R32 M12', date:'Jul 2',  venue:'Toronto',       result:null},
+    {id:85, home:'Switzerland',  away:'Algeria',      label:'R32 M13', date:'Jul 2',  venue:'Vancouver',     result:null},
+    {id:86, home:'Australia',    away:'Egypt',        label:'R32 M14', date:'Jul 3',  venue:'Dallas',        result:null},
+    {id:87, home:'Argentina',    away:'Cape Verde',   label:'R32 M15', date:'Jul 3',  venue:'Miami',         result:null},
+    {id:88, home:'Colombia',     away:'Ghana',        label:'R32 M16', date:'Jul 3',  venue:'Kansas City',   result:null},
+  ];
+  // Gabungkan dengan koScores yang datang dari API
+  return R32.map(m => {
+    const apiScore = koScores[`${m.home}__${m.away}`] || koScores[`${m.away}__${m.home}`];
+    if(apiScore) {
+      const rev = !!koScores[`${m.away}__${m.home}`];
+      return {...m, result:{home: rev?apiScore.away:apiScore.home, away: rev?apiScore.home:apiScore.away, done:apiScore.status?.includes('Finished')||false}};
+    }
+    return m;
+  });
 }
-function getWinner(matchId,h,a){ const s=koScores[matchId]; if(!s)return null; return +s.home>+s.away?h:+s.away>+s.home?a:null; }
+
+function getR16Winner(match){
+  if(!match.result) return null;
+  const {home, away, done} = match.result;
+  if(!done) return null;
+  return home > away ? match.home : away > home ? match.away : null;
+}
+function getWinner(matchId,h,a){
+  const s=koScores[matchId];
+  if(!s) return null;
+  if(!s.done) return null;
+  return +s.home>+s.away?h:+s.away>+s.home?a:null;
+}
 function getQF(r16){
-  const w=id=>{ const m=r16.find(x=>x.id===id); return m?getWinner(id,m.home,m.away):null; };
+  const w=id=>{ const m=r16.find(x=>x.id===id); return m?getR16Winner(m):null; };
   return [
-    {id:89,home:w(73)||'W M1',away:w(74)||'W M2',label:'QF 1',date:'Jul 13'},
-    {id:90,home:w(75)||'W M3',away:w(76)||'W M4',label:'QF 2',date:'Jul 13'},
-    {id:91,home:w(77)||'W M5',away:w(78)||'W M6',label:'QF 3',date:'Jul 14'},
-    {id:92,home:w(79)||'W M7',away:w(80)||'W M8',label:'QF 4',date:'Jul 14'},
-    {id:93,home:w(81)||'W M9',away:w(82)||'W M10',label:'QF 5',date:'Jul 15'},
-    {id:94,home:w(83)||'W M11',away:w(84)||'W M12',label:'QF 6',date:'Jul 15'},
-    {id:95,home:w(85)||'W M13',away:w(86)||'W M14',label:'QF 7',date:'Jul 16'},
-    {id:96,home:w(87)||'W M15',away:w(88)||'W M16',label:'QF 8',date:'Jul 16'},
+    {id:89,home:w(73)||'W R32-M1',away:w(76)||'W R32-M4',label:'R16 M1',date:'Jul 4',venue:'Philadelphia'},
+    {id:90,home:w(74)||'W R32-M2',away:w(75)||'W R32-M3',label:'R16 M2',date:'Jul 4',venue:'Houston'},
+    {id:91,home:w(77)||'W R32-M5',away:w(80)||'W R32-M8',label:'R16 M3',date:'Jul 5',venue:'New York'},
+    {id:92,home:w(78)||'W R32-M6',away:w(79)||'W R32-M7',label:'R16 M4',date:'Jul 5',venue:'Mexico City'},
+    {id:93,home:w(81)||'W R32-M9',away:w(84)||'W R32-M12',label:'R16 M5',date:'Jul 6',venue:'Dallas'},
+    {id:94,home:w(82)||'W R32-M10',away:w(83)||'W R32-M11',label:'R16 M6',date:'Jul 6',venue:'Seattle'},
+    {id:95,home:w(85)||'W R32-M13',away:w(88)||'W R32-M16',label:'R16 M7',date:'Jul 7',venue:'Atlanta'},
+    {id:96,home:w(86)||'W R32-M14',away:w(87)||'W R32-M15',label:'R16 M8',date:'Jul 7',venue:'Vancouver'},
   ];
 }
 function getSF(qf){
   const w=id=>{ const m=qf.find(x=>x.id===id); return m?getWinner(id,m.home,m.away):null; };
   return [
-    {id:97,home:w(89)||'W QF1',away:w(90)||'W QF2',label:'SF 1',date:'Jul 17'},
-    {id:98,home:w(91)||'W QF3',away:w(92)||'W QF4',label:'SF 2',date:'Jul 17'},
-    {id:99,home:w(93)||'W QF5',away:w(94)||'W QF6',label:'SF 3',date:'Jul 18'},
-    {id:100,home:w(95)||'W QF7',away:w(96)||'W QF8',label:'SF 4',date:'Jul 18'},
+    {id:97, home:w(89)||'W R16-M1',away:w(90)||'W R16-M2',label:'QF 1',date:'Jul 9', venue:'Boston'},
+    {id:98, home:w(91)||'W R16-M3',away:w(92)||'W R16-M4',label:'QF 2',date:'Jul 9', venue:'New York'},
+    {id:99, home:w(93)||'W R16-M5',away:w(94)||'W R16-M6',label:'QF 3',date:'Jul 10',venue:'Los Angeles'},
+    {id:100,home:w(95)||'W R16-M7',away:w(96)||'W R16-M8',label:'QF 4',date:'Jul 11',venue:'Dallas'},
   ];
 }
 function getFinal(sf){
   const w=id=>{ const m=sf.find(x=>x.id===id); return m?getWinner(id,m.home,m.away):null; };
   const L=id=>{ const m=sf.find(x=>x.id===id); if(!m)return null; const s=koScores[id]; if(!s)return null; return +s.home<+s.away?m.home:+s.away<+s.home?m.away:null; };
   return {
-    third1:{id:101,home:L(97)||'L SF1',away:L(98)||'L SF2',label:'3rd Place',date:'Jul 18'},
-    third2:{id:102,home:L(99)||'L SF3',away:L(100)||'L SF4',label:'3rd Place',date:'Jul 18'},
-    final1:{id:103,home:w(97)||'W SF1',away:w(98)||'W SF2',label:'FINAL A',date:'Jul 19'},
-    final2:{id:104,home:w(99)||'W SF3',away:w(100)||'W SF4',label:'FINAL B',date:'Jul 19'},
+    third:{id:101,home:w(97)||'L QF1',away:w(98)||'L QF2',label:'3rd Place',date:'Jul 18',venue:'Miami'},
+    final:{id:103,home:w(97)||'W QF1',away:w(98)||'W QF2',label:'FINAL',date:'Jul 19',venue:'New York/NJ'},
   };
 }
 function getChampion(finals){
-  const wa=getWinner(103,finals.final1.home,finals.final1.away);
-  const wb=getWinner(104,finals.final2.home,finals.final2.away);
-  return wa||wb||null;
+  return getWinner(103, finals.final?.home||'?', finals.final?.away||'?') || null;
 }
 
 // ══════════════════════════════════════════════════════
@@ -1103,23 +1118,27 @@ function renderKnockout(){
   const champ=getChampion(finals);
 
   function bmHTML(match){
-    const s=koScores[match.id];
-    const hasSc=!!s;
-    const hw=s&&+s.home>+s.away;
-    const aw=s&&+s.away>+s.home;
-    const htbd=!match.home||match.home.startsWith('W ')||match.home.startsWith('L ')||match.home.startsWith('Best')||match.home==='?';
-    const atbd=!match.away||match.away.startsWith('W ')||match.away.startsWith('L ')||match.away.startsWith('Best')||match.away==='?';
+    const r = match.result;
+    const hasSc = r && (r.home !== undefined);
+    const hw = hasSc && r.home > r.away && r.done;
+    const aw = hasSc && r.away > r.home && r.done;
+    const htbd = !match.home || match.home === '?';
+    const atbd = !match.away || match.away === '?';
+    const isLive = hasSc && !r.done;
     return `
-      <div class="bm ${hasSc?'has-score':''}">
+      <div class="bm ${hasSc?'has-score':''}" style="${isLive?'border-color:rgba(239,68,68,.5);':''}">
         <div class="bt ${htbd?'tbd':''} ${hw?'winner':''}">
-          <span>${htbd?'–':`${fl(match.home)} ${match.home}`}</span>
-          <span class="bscore">${s?s.home:''}</span>
+          <span style="font-size:10px;">${htbd?'–':`${fl(match.home)} ${match.home}`}</span>
+          <span class="bscore" style="${isLive?'color:var(--orange)':''}">${hasSc?r.home:''}</span>
         </div>
         <div class="bt ${atbd?'tbd':''} ${aw?'winner':''}">
-          <span>${atbd?'–':`${fl(match.away)} ${match.away}`}</span>
-          <span class="bscore">${s?s.away:''}</span>
+          <span style="font-size:10px;">${atbd?'–':`${fl(match.away)} ${match.away}`}</span>
+          <span class="bscore" style="${isLive?'color:var(--orange)':''}">${hasSc?r.away:''}</span>
         </div>
-        <div class="bm-info"><span>${match.label}</span><span>${match.date}</span></div>
+        <div class="bm-info">
+          <span>${match.label||''}</span>
+          <span>${match.venue||''} · ${match.date||''}</span>
+        </div>
       </div>`;
   }
 
@@ -1128,44 +1147,77 @@ function renderKnockout(){
     ? '&#10003; Semua grup selesai &mdash; bracket final'
     : `&#9203; ${doneCount}/12 grup selesai &mdash; bracket diperbarui otomatis saat grup selesai`;
 
+  // R32 sebagai jadwal card (mobile-friendly)
+  const r32Days = [
+    {label:'Minggu, 28 Jun', matches:[r16[0]]},
+    {label:'Senin, 29 Jun',  matches:r16.slice(1,4)},
+    {label:'Selasa, 30 Jun', matches:r16.slice(4,7)},
+    {label:'Rabu, 1 Jul',    matches:r16.slice(7,10)},
+    {label:'Kamis, 2 Jul',   matches:r16.slice(10,13)},
+    {label:'Jumat, 3 Jul',   matches:r16.slice(13,16)},
+  ];
+
+  const r32HTML = r32Days.map(g=>`
+    <div class="mday">
+      <div class="mday-head">${g.label}</div>
+      ${g.matches.map(m=>{
+        const r=m.result;
+        const hasSc=r&&(r.home!==undefined);
+        const done=r?.done;
+        const hw=done&&r.home>r.away;
+        const aw=done&&r.away>r.home;
+        return `<div class="mrow ${hasSc?'has-score':''}" >
+          <div class="mrow-meta">
+            <span class="mbadge">${m.label}</span>
+            ${!done&&hasSc?'<span class="mlive-tag">LIVE</span>':''}
+            ${done?'<span style="font-size:9px;color:var(--green);font-weight:700;">&#10003; FT</span>':''}
+            <span class="mtime">${m.venue}</span>
+          </div>
+          <div class="mteam h" style="${hw?'color:var(--green);font-weight:800;':''}">
+            ${m.home} <span class="mflag">${fl(m.home)}</span>
+          </div>
+          <div class="sbox">
+            ${hasSc
+              ?'<div class="sv">'+r.home+'&ndash;'+r.away+'</div>'
+              :'<div class="vs">VS</div><div class="vtime">'+m.date+'</div>'}
+          </div>
+          <div class="mteam a" style="${aw?'color:var(--green);font-weight:800;':''}">
+            <span class="mflag">${fl(m.away)}</span> ${m.away}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`).join('');
+
   document.getElementById('tab-knockout').innerHTML=`
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
-      <span style="font-size:10px;color:${allGroupsDone?'var(--green)':'var(--accent)'};">${statusMsg}</span>
-      <span style="font-size:10px;color:var(--dim);margin-left:auto;">Update otomatis &bull; tap refresh untuk skor terbaru</span>
+      <span style="font-size:10px;color:var(--green);">&#10003; Group stage selesai &mdash; Round of 32 berlangsung 28 Jun &ndash; 3 Jul</span>
     </div>
-    <div style="font-size:10px;color:var(--dim);margin-bottom:10px;">
-      &#128202; Posisi tim berdasarkan hasil babak penyisihan grup (live) &bull; Tanda <span style="color:var(--accent2);">?</span> = grup belum selesai
-    </div>
+    <div class="sec-title">&#127942; Round of 32</div>
+    ${r32HTML}
+    <div class="sec-title" style="margin-top:4px;">Bracket R16 &rarr; Final</div>
     <div class="bracket-wrap">
-      <div class="bracket">
-        <div class="b-round" style="min-width:165px">
-          <div class="b-round-head">ROUND OF 16</div>
-          <div class="b-round-body">${r16.slice(0,8).map(m=>bmHTML(m)).join('')}</div>
-        </div>
-        <div class="b-round" style="min-width:165px">
-          <div class="b-round-head">ROUND OF 16</div>
-          <div class="b-round-body">${r16.slice(8,16).map(m=>bmHTML(m)).join('')}</div>
-        </div>
+      <div class="bracket" style="min-width:650px;">
         <div class="b-round">
-          <div class="b-round-head">QUARTERFINALS</div>
+          <div class="b-round-head">ROUND OF 16</div>
           <div class="b-round-body">${qf.map(m=>bmHTML(m)).join('')}</div>
         </div>
         <div class="b-round">
-          <div class="b-round-head">SEMI-FINALS</div>
+          <div class="b-round-head">QUARTER-FINALS</div>
           <div class="b-round-body">${sf.map(m=>bmHTML(m)).join('')}</div>
         </div>
-        <div class="b-round" style="min-width:150px">
-          <div class="b-round-head">3RD / FINAL</div>
+        <div class="b-round" style="min-width:130px;">
+          <div class="b-round-head">SEMI-FINALS</div>
           <div class="b-round-body">
-            ${bmHTML(finals.third1)}${bmHTML(finals.third2)}
-            ${bmHTML(finals.final1)}${bmHTML(finals.final2)}
+            ${bmHTML({home:getWinner(sf[0]?.id,sf[0]?.home||'?',sf[0]?.away||'?')||'W QF1',away:getWinner(sf[1]?.id,sf[1]?.home||'?',sf[1]?.away||'?')||'W QF2',label:'SF1',date:'Jul 14-15',result:null})}
+            ${bmHTML({home:getWinner(sf[2]?.id,sf[2]?.home||'?',sf[2]?.away||'?')||'W QF3',away:getWinner(sf[3]?.id,sf[3]?.home||'?',sf[3]?.away||'?')||'W QF4',label:'SF2',date:'Jul 14-15',result:null})}
           </div>
         </div>
-        <div style="display:flex;flex-direction:column;justify-content:center;padding:4px;min-width:110px">
+        <div style="display:flex;flex-direction:column;justify-content:center;padding:4px;min-width:110px;">
           <div class="champ-box">
-            <div class="champ-trophy">🏆</div>
+            <div class="champ-trophy">&#127942;</div>
             <div class="champ-label">CHAMPION</div>
             <div class="champ-name">${champ?fl(champ)+' '+champ:'?'}</div>
+            <div style="font-size:9px;color:var(--dim);margin-top:4px;">19 Jul &bull; New York</div>
           </div>
         </div>
       </div>
@@ -1235,27 +1287,28 @@ function renderStats(){
     </div>`;
 }
 
-// ── TOP SCORER — updated 26 Juni 2026 (MD1+MD2+MD3 Grup A-F)
-// Sumber: Goal.com, FourFourTwo, Olympics.com, FOX Sports Golden Boot tracker
+// ── TOP SCORER FINAL GROUP STAGE — 28 Jun 2026 ──
+// Sumber: FOX Sports Golden Boot Tracker, Goal.com, whereig.com
+// Messi masih pimpin, Haaland & Mbappe & Vinicius kejar
 let TOP_SCORERS = [
-  {name:'Lionel Messi',       team:'Argentina',     pos:'FW', goals:5, assists:2, matches:2},
-  {name:'Erling Haaland',     team:'Norway',        pos:'FW', goals:4, assists:0, matches:2},
-  {name:'Matheus Cunha',      team:'Brazil',        pos:'FW', goals:3, assists:0, matches:3},
-  {name:'Kylian Mbappé',      team:'France',        pos:'FW', goals:3, assists:1, matches:2},
-  {name:'Deniz Undav',        team:'Germany',       pos:'FW', goals:3, assists:2, matches:3},
-  {name:'Ismael Saibari',     team:'Morocco',       pos:'MF', goals:3, assists:0, matches:3},
-  {name:'Vinicius Jr.',       team:'Brazil',        pos:'FW', goals:3, assists:1, matches:3},
-  {name:'Folarin Balogun',    team:'United States', pos:'FW', goals:3, assists:0, matches:3},
-  {name:'Cody Gakpo',         team:'Netherlands',   pos:'FW', goals:2, assists:1, matches:3},
-  {name:'Cyle Larin',         team:'Canada',        pos:'FW', goals:2, assists:0, matches:3},
-  {name:'Ayase Ueda',         team:'Japan',         pos:'FW', goals:2, assists:0, matches:3},
-  {name:'Harry Kane',         team:'England',       pos:'FW', goals:2, assists:0, matches:2},
-  {name:'Johan Manzambi',     team:'Switzerland',   pos:'MF', goals:2, assists:1, matches:3},
-  {name:'Mohamed Salah',      team:'Egypt',         pos:'FW', goals:2, assists:1, matches:2},
-  {name:'Raul Jimenez',       team:'Mexico',        pos:'FW', goals:2, assists:0, matches:3},
-  {name:'Kai Havertz',        team:'Germany',       pos:'FW', goals:2, assists:1, matches:3},
+  {name:'Lionel Messi',         team:'Argentina',     pos:'FW', goals:5, assists:3, matches:3},
+  {name:'Vinicius Jr.',         team:'Brazil',        pos:'FW', goals:4, assists:1, matches:3},
+  {name:'Erling Haaland',       team:'Norway',        pos:'FW', goals:4, assists:0, matches:3},
+  {name:'Kylian Mbappé',        team:'France',        pos:'FW', goals:4, assists:1, matches:3},
+  {name:'Ousmane Dembélé',      team:'France',        pos:'FW', goals:3, assists:1, matches:3},
+  {name:'Ismaila Sarr',         team:'Senegal',       pos:'FW', goals:3, assists:0, matches:3},
+  {name:'Ismael Saibari',       team:'Morocco',       pos:'MF', goals:3, assists:0, matches:3},
+  {name:'Matheus Cunha',        team:'Brazil',        pos:'FW', goals:3, assists:0, matches:3},
+  {name:'Folarin Balogun',      team:'United States', pos:'FW', goals:3, assists:0, matches:3},
+  {name:'Cody Gakpo',           team:'Netherlands',   pos:'FW', goals:2, assists:1, matches:3},
+  {name:'Harry Kane',           team:'England',       pos:'FW', goals:2, assists:1, matches:3},
+  {name:'Ayase Ueda',           team:'Japan',         pos:'FW', goals:2, assists:0, matches:3},
+  {name:'Brian Brobbey',        team:'Netherlands',   pos:'FW', goals:2, assists:0, matches:3},
+  {name:'Cristiano Ronaldo',    team:'Portugal',      pos:'FW', goals:2, assists:0, matches:3},
+  {name:'Mohamed Salah',        team:'Egypt',         pos:'FW', goals:2, assists:1, matches:3},
+  {name:'Deniz Undav',          team:'Germany',       pos:'FW', goals:2, assists:2, matches:3},
 ];
-let tsLastUpdated = '26 Jun 2026';
+let tsLastUpdated = '28 Jun 2026';
 let tsAutoRefreshed = false;
 
 // ══════════════════════════════════════════════════════
@@ -1289,10 +1342,15 @@ function toast(msg, type=''){
 const FIFA_YT_CHANNEL = 'UCpcTrCXblq78GZrTUTLWeBw';
 const FIFA_YT_URL = 'https://www.youtube.com/@fifa';
 
-// Video ID terverifikasi 100% dari search results YouTube — 26 Juni 2026
-// Semua URL dikonfirmasi: youtube.com/watch?v=ID
+// Video ID terverifikasi dari YouTube search results — update 28 Jun 2026
 const HL_VIDEOS_STATIC = [
-  // ── MATCHDAY 3 ──
+  // ── MD3 TERBARU ──
+  {id:'sPJIf3GfNo0', title:'Jordan vs Argentina Extended Highlights | Group J | FIFA World Cup 2026™', matchday:3, date:'Jun 27'},
+  {id:'cRb6GQEAsU8', title:'Colombia vs Portugal Extended Highlights | Group K | FIFA World Cup 2026™', matchday:3, date:'Jun 27'},
+  {id:'JOPTAAFb3_s', title:'Panama vs England Extended Highlights | Group L | FIFA World Cup 2026™', matchday:3, date:'Jun 27'},
+  {id:'3OVZj9WqyDc', title:'Uruguay vs Spain Extended Highlights | Group H | FIFA World Cup 2026™', matchday:3, date:'Jun 27'},
+  {id:'Rouzq1yDV-Q', title:'New Zealand vs Belgium Extended Highlights | Group G | FIFA World Cup 2026™', matchday:3, date:'Jun 26'},
+  {id:'VB1B9bkj2xc', title:'Norway vs France Extended Highlights | Group I | FIFA World Cup 2026™', matchday:3, date:'Jun 26'},
   {id:'fWN13Oe4kA0', title:'Scotland vs Brazil Extended Highlights | Group C | FIFA World Cup 2026™', matchday:3, date:'Jun 24'},
   {id:'IR891e2-JBc', title:'Czechia vs Mexico Extended Highlights | Group A | FIFA World Cup 2026™', matchday:3, date:'Jun 24'},
   {id:'ebuYwC7lwCk', title:'England vs Ghana Extended Highlights | Group L | FIFA World Cup 2026™', matchday:3, date:'Jun 24'},
@@ -1320,8 +1378,6 @@ const HL_VIDEOS_STATIC = [
   {id:'0rih2fCaXF4', title:'Brazil vs Morocco Extended Highlights | Group C | FIFA World Cup 2026™', matchday:1, date:'Jun 13'},
   {id:'F1sMvm6D-0Y', title:'Mexico vs South Korea Extended Highlights | Group A | FIFA World Cup 2026™', matchday:2, date:'Jun 18'},
 ];
-
-// Semua video di atas sudah terverifikasi dari search results
 const HL_CONFIRMED = {};
 HL_VIDEOS_STATIC.forEach(v => HL_CONFIRMED[v.id] = true);
 
@@ -1800,97 +1856,102 @@ function showTab(id, btn){
 const PREDICTIONS = [
   {
     rank: 1,
-    team: 'France',
-    odds: '+370',
-    probability: '27%',
-    form: ['W','W'], // MD1: 3-1, MD2: 3-0
-    gf: 6, ga: 1,
-    badge: '🥇 FAVORIT UTAMA',
+    team: 'Brazil',
+    odds: '+380',
+    probability: '22%',
+    form: ['D','W','W'],
+    gf: 7, ga: 1,
+    badge: '&#127941; FAVORIT BARU POST-GROUP STAGE',
     badgeColor: 'var(--accent)',
-    coach: 'Didier Deschamps (jabatan terakhir setelah WC2026)',
+    coach: 'Carlo Ancelotti (4&#xD7; UCL winner, pelatih tersukses aktif di dunia)',
     strengths: [
-      '6 gol dalam 2 laga — serangan paling produktif bersama Germany',
-      'Mbappé dalam form terbaik: 3 gol 1 assist, mobilitas tinggi',
-      'Lini tengah terkuat: Tchouameni-Camavinga-Rabiot sangat solid',
-      'Maignan di bawah mistar — performa konsisten sejak AC Milan',
-      'Kedalaman skuad luar biasa: bisa rotasi tanpa turun kualitas',
+      'Vinicius Jr. 4 gol &#8212; mesin serangan yang tak terbendung di turnamen ini',
+      'Matheus Cunha 3 gol &#8212; revelasi turnamen, duet lethal dengan Vinicius',
+      'Ancelotti = rotasi cerdas: Neymar kembali MD3, depth skuad tak tertandingi',
+      'Hanya 1 gol kebobolan dalam 3 laga &#8212; pertahanan terkokoh di antara big teams',
+      'Group C winner dengan GD +6 &#8212; momentum psikologis terbaik',
+      'Bracket: Japan R32 &#8212; lawan yang dapat dikontrol untuk warm-up knockout',
     ],
     concerns: [
-      'Norway di MD3 lawan berat — Haaland bisa ancam lini belakang',
-      'Upamecano kadang rentan satu lawan satu',
-      'Deschamps pensiun setelah turnamen — motivasi extra pressure',
+      'Japan pernah kalah Brazil 2-3 dalam friendly Oktober 2025 &#8212; familiar dengan kelemahan',
+      'Neymar (33) kembali dari cedera panjang &#8212; belum terbukti bisa 90 menit penuh',
+      'Casemiro (34) terlihat lambat vs high press &#8212; risiko di QF/SF',
+      'Belum diuji lawan defensive block compact ala Eropa (Argentina/Spain)',
     ],
     keyPlayers: [
-      {name:'Kylian Mbappé', pos:'FW', note:'3G 1A — on fire, calon Golden Boot'},
-      {name:'Aurélien Tchouameni', pos:'MF', note:'Jangkar pertahanan Real Madrid'},
-      {name:'Mike Maignan', pos:'GK', note:'Hanya 1 gol kebobolan'},
-      {name:'Marcus Thuram', pos:'FW', note:'Duet mematikan dengan Mbappé'},
+      {name:'Vinicius Jr.', pos:'FW', note:'4G 1A &#8212; Best Player kandidat, kecepatan tak terkejar'},
+      {name:'Matheus Cunha', pos:'FW', note:'3G &#8212; dari supersub jadi starter tak tergantikan'},
+      {name:'Rodrygo', pos:'FW', note:'Fleksibel sayap kanan, dribling elite di half-space'},
+      {name:'Alisson Becker', pos:'GK', note:'Penyelamatan kritis, 1 kebobolan dalam 3 laga'},
     ],
-    analysis: 'France adalah tim paling lengkap di turnamen ini. Kemenangan 3-1 atas Senegal dan 3-0 atas Iraq memperlihatkan dominasi total — bukan hanya skor akhir, tapi kontrol permainan. Mbappé beroperasi lebih bebas di bawah Deschamps dibanding PSG, dan kombinasinya dengan Thuram menciptakan ruang yang selalu bisa dieksploitasi. Deschamps yang akan pensiun usai turnamen ini punya motivasi ekstra untuk memberikan warisan terbaik. Lini pertahanan yang hanya kebobolan 1 gol dari 2 laga menunjukkan kedewasaan tim. France punya jalur bracket yang bisa mempertemukan mereka dengan Spain atau England di semifinal — sebuah tes sesungguhnya.',
-    route: 'Group I → R32 (Jul 1) → R16 (Jul 7) → QF (Jul 14) → SF (Jul 17) → Final (Jul 19)',
+    analysis: 'Dalam 24 tahun absen dari tangga juara, Brazil di bawah Ancelotti akhirnya menemukan formula yang benar. Mantan maestro Real Madrid mengubah Selecao dari tim berbakat tapi inkonsisten menjadi mesin yang efisien dan mematikan. Kuncinya adalah Ancelotti tidak bergantung pada satu bintang: jika Vinicius dimark ketat, Cunha melukai dari celah; jika Cunha butuh istirahat, Neymar masuk dengan class-nya. Secara statistik, Brazil adalah tim paling seimbang &#8212; tertajam kedua (7 gol) namun terkukuh di pertahanan (1 kebobolan). Bracket mereka menuju Final melewati Japan-Maroko atau Ivory Coast/Norway &#8212; semua bisa dikalahkan. Ancaman terbesar justru overconfidence, yang Ancelotti tahu persis cara mencegahnya setelah puluhan tahun melatih di level tertinggi.',
+    route: 'Grup C 1st &#8594; R32 vs Japan (Jun 29) &#8594; R16 &#8594; QF &#8594; SF &#8594; Final Jul 19',
   },
   {
     rank: 2,
     team: 'Argentina',
-    odds: '+600',
-    probability: '14%',
-    form: ['W','W'],
-    gf: 5, ga: 0,
-    badge: '🥈 JUARA BERTAHAN',
+    odds: '+420',
+    probability: '18%',
+    form: ['W','W','W'],
+    gf: 8, ga: 1,
+    badge: '&#127942; JUARA BERTAHAN &#8212; 9 POIN SEMPURNA',
     badgeColor: 'var(--accent2)',
-    coach: 'Lionel Scaloni (arsitek double-champion 2021 Copa América & 2022 WC)',
+    coach: 'Lionel Scaloni &#8212; taktikus paling konsisten, arsitek back-to-back champion',
     strengths: [
-      'Messi 5 gol 2 assist — turnamen terbaik sepanjang karirnya di WC',
-      'Defensive record sempurna: 0 gol kebobolan dalam 2 laga',
-      'Julian Alvarez & Lautaro sebagai opsi striker — fleksibel',
-      'Scaloni punya game plan matang: press tinggi + transisi cepat',
-      'Mentalitas juara — squad yang sama yang menang 2022 hampir utuh',
+      '9 poin dari 9 &#8212; satu-satunya tim besar dengan rekor grup sempurna',
+      'Messi 5G 3A &#8212; all-time WC record, 38 tahun tapi masih pimpin Golden Boot',
+      'Emiliano Mart&#237;nez: hanya 1 gol kebobolan, penyelamatan kritis vs Algeria & Austria',
+      'Mac Allister + Enzo Fernandez: double pivot Liverpool/Chelsea yang tak tertandingi',
+      'Julian Alvarez: pressing kamikaze + mobilitas = mimpi buruk bagi centerback manapun',
+      'Scaloni rotasi sempurna &#8212; Lautaro segar untuk knockout stages',
     ],
     concerns: [
-      'Messi 38 tahun — beban fisik di 7-8 laga beruntun berisiko',
-      'Mac Allister & Enzo Fernandez perlu konsisten di laga besar',
-      'Bracket bisa mempertemukan France/Spain di semi — gauntlet berat',
+      'Messi 38 tahun &#8212; akumulasi fisik di laga ke-5, 6, 7 bisa jadi risiko',
+      'Cape Verde R32 &#8212; yang seri 0-0 lawan Spain! Bahaya underestimation',
+      'Belum diuji lawan striker top Eropa (Haaland, Vinicius) &#8212; open question',
+      'Bracket: potensi bentrok Brazil di SF &#8212; duel Amerika Selatan terbesar sepanjang masa',
     ],
     keyPlayers: [
-      {name:'Lionel Messi', pos:'FW', note:'5G 2A — memimpin Golden Boot, WC terakhir'},
-      {name:'Julian Alvarez', pos:'FW', note:'Pergerakan tanpa bola luar biasa'},
-      {name:'Alexis Mac Allister', pos:'MF', note:'Mesin Liverpool yang tak kenal lelah'},
-      {name:'Emiliano Martínez', pos:'GK', note:'0 gol kebobolan — tembok Argentina'},
+      {name:'Lionel Messi', pos:'FW', note:'5G 3A &#8212; WC terakhir, everything to prove and show'},
+      {name:'Emiliano Mart&#237;nez', pos:'GK', note:'1 kebobolan &#8212; calon Golden Glove'},
+      {name:'Mac Allister', pos:'MF', note:'Liverpool engine, box-to-box yang tak kenal lelah'},
+      {name:'Julian Alvarez', pos:'FW', note:'Man City pressing machine, decisive di momen besar'},
     ],
-    analysis: 'Messi dalam mode "turnamen terakhir, all in." Hat-trick lawan Algérie di MD1 lalu assist 2 gol lawan Austria — performa 38 tahun ini defies logic. Scaloni membangun tim yang benar-benar melindungi Messi: struktur press tinggi, Mac Allister & Enzo menjaga keseimbangan, lalu melepas Messi bebas di half-space. Tanpa kebobolan setelah 180 menit, Argentina paling mungkin menjaga clean sheet di turnamen ini. Risiko utama adalah beban fisik Messi jika harus bermain penuh 7 laga — tapi Scaloni tahu persis kapan harus merotasi. Bracket Argentina lebih "mudah" di awal bracket sebelum potensi bentrok France/Spain di semi.',
-    route: 'Group J → R32 (Jun 30) → R16 (Jul 7) → QF (Jul 14) → SF (Jul 18) → Final (Jul 19)',
+    analysis: 'Argentina adalah tim paling konsisten dan paling mematikan secara statistik di grup stage. 9 poin penuh, 8 gol, hanya 1 kebobolan &#8212; trio statistik yang tidak dicapai tim lain manapun. Scaloni telah menyempurnakan formula Qatar 2022: pertahanan kokoh sebagai fondasi, Messi sebagai pemain bebas yang muncul di momen kritis, Mac Allister-Enzo sebagai mesin kerja yang tak lelah. Yang berbeda dari 2022 adalah kedalaman &#8212; Lautaro, Alvarez, Rodrigo De Paul, semuanya di puncak form musim 2025/26. Messi di usia 38 tidak berlari 90 menit, tapi ia tidak perlu: ia hadir di 5 momen kritis dan mengeksekusi semuanya. Tantangan psikologis terbesar adalah menghadapi Cape Verde (yang tidak takut siapapun setelah 3 kali tidak kalah di grup). Jika Argentina lolos R32 dengan bersih, potensi Argentina vs Brazil di semifinal akan menjadi salah satu duel terbesar dalam 100 tahun sejarah sepakbola.',
+    route: 'Grup J 1st &#8594; R32 vs Cape Verde (Jul 3, Miami) &#8594; R16 &#8594; QF &#8594; SF &#8594; Final Jul 19',
   },
   {
     rank: 3,
-    team: 'Spain',
-    odds: '+500',
-    probability: '20%',
-    form: ['D','W'],
-    gf: 4, ga: 0,
-    badge: '🥉 DARK HORSE BERBAHAYA',
-    badgeColor: 'var(--green)',
-    coach: 'Luis de la Fuente (Euro 2024 champion)',
+    team: 'France',
+    odds: '+490',
+    probability: '15%',
+    form: ['W','W','L'],
+    gf: 7, ga: 5,
+    badge: '&#9888;&#65039; TURUN TANGGA &#8212; KALAH NORWAY, MASIH BERBAHAYA',
+    badgeColor: 'var(--orange)',
+    coach: 'Didier Deschamps (absen MD3 krn pemakaman ibunya &#8212; Thierry Henry pimpin)',
     strengths: [
-      'Pemenang Euro 2024 — DNA juara masih segar',
-      'Lamine Yamal kembali fit: pemain paling kreatif di turnamen',
-      'Rodri sebagai metronom — kontrol midfield terbaik dunia',
-      'Sistem tiki-taka evolusi: lebih vertikal dan cepat dari era sebelumnya',
-      'Morata + Joselu + Nico Williams — trio serangan komplementer',
+      'Mbapp&#233; 4G 1A &#8212; masih calon Golden Boot terkuat kedua setelah Messi',
+      'Dembel&#233; hat-trick vs Iraq MD2 &#8212; revealed as major weapon',
+      'Squad depth tak tertandingi: Giroud, Olise, Barcola bisa masuk kapanpun',
+      'Thuram + Mbapp&#233; = duet yang belum bisa dijinakkan tim manapun',
+      'Dengan Deschamps kembali: sistem 4-3-3 kembali terstruktur',
     ],
     concerns: [
-      'Hasil imbang 0-0 lawan Cape Verde — alarm serius, Spain mestinya menang mudah',
-      'Yamal kondisi belum 100% fit di awal turnamen',
-      'Ketergantungan pada Rodri — jika cedera, Spain langsung rentan',
-      'Sejarah WC: Spain hanya juara sekali (2010) — pressure besar',
+      'Kekalahan 1-4 vs Norway MD3 &#8212; worst defeat France dalam 24 tahun di WC',
+      'Upamecano terlihat panik saat pressing tinggi &#8212; kelemahan struktural',
+      'MD3 France sangat berotasi &#8212; tapi kebobolan 4 gol tetap traumatis secara psikologi',
+      'Bracket: R32 vs Sweden, lalu berpotensi Norway lagi di R16 &#8212; mimpi buruk',
+      'Tchouameni cedera ringan di MD3 &#8212; status belum jelas untuk R32',
     ],
     keyPlayers: [
-      {name:'Lamine Yamal', pos:'FW', note:'17 tahun, pemain terbaik Euro 2024, kembali fit'},
-      {name:'Rodri', pos:'MF', note:'Ballon d\'Or 2024 — metronom tak tergantikan'},
-      {name:'Pedri', pos:'MF', note:'Kreativitas Barcelona di level dunia'},
-      {name:'Alvaro Morata', pos:'FW', note:'Kapten berpengalaman, tajam di bawah tekanan'},
+      {name:'Kylian Mbapp&#233;', pos:'FW', note:'4G 1A &#8212; 2x Golden Boot winner? Momentum ada'},
+      {name:'Ousmane Dembel&#233;', pos:'FW', note:'3G 1A &#8212; hat-trick vs Iraq, underrated weapon'},
+      {name:'Mike Maignan', pos:'GK', note:'Kembali jadi penjaga kunci &#8212; Maignan di form terbaik'},
+      {name:'Aur&#233;lien Tchouameni', pos:'MF', note:'Status injury menentukan kedalaman pertahanan'},
     ],
-    analysis: 'Spain secara kualitas skuad mungkin paling dalam di turnamen ini — dan hasil imbang 0-0 lawan Cape Verde itu anomali, bukan tanda kelemahan. Terlalu dini untuk panik. Kemenangan 4-0 lawan Saudi Arabia memperlihatkan Spain yang sesungguhnya: dominan, fluid, tak termaafkan. Yamal yang kembali fit adalah game-changer — di Euro 2024 ia seorang diri membongkar sistem bertahan terbaik Eropa. Rodri mengatur tempo seperti konduktor orkestra. Risiko terbesar Spain adalah jika mereka bertemu France terlalu awal — keduanya berpotensi di semifinal. Namun jika bracket berpihak, Spain bisa sangat berbahaya di fase gugur.',
-    route: 'Group H → R32 (Jun 29) → R16 (Jul 6) → QF (Jul 13) → SF (Jul 17) → Final (Jul 19)',
+    analysis: 'France menghadapi momen krisis dan momen kebangkitan sekaligus. Kekalahan 1-4 lawan Norway adalah yang terburuk France di Piala Dunia dalam seperempat abad &#8212; tapi konteksnya vital: Deschamps absen (menghadiri pemakaman ibunya), France berotasi dengan 6 perubahan, dan Norway sedang dalam form terbaik sepanjang sejarah mereka. Dengan Deschamps kembali untuk fase knockout, France yang &#39;asli&#39; belum kita lihat di turnamen ini. 4 gol Mbapp&#233; dan hat-trick Dembel&#233; membuktikan serangan France masih yang paling mengerikan di turnamen. Pertanyaan sesungguhnya: apakah lini belakang France cukup solid untuk menghadapi tim yang menyerang dengan presisi? R32 vs Sweden bisa jadi peringatan kedua &#8212; Gyokeres, Isak, Ayari bukan nama-nama kecil. Tapi jika pertahanan kembali solid, France masih layak disebut kandidat juara.',
+    route: 'Grup I 1st &#8594; R32 vs Sweden (Jun 30, NJ) &#8594; R16 &#8594; QF &#8594; SF &#8594; Final Jul 19',
   }
 ];
 
@@ -1965,20 +2026,21 @@ function renderPrediction(){
   el.innerHTML = `
     <div class="sec-title">🔮 Prediksi Potensi Juara</div>
     <div style="font-size:10px;color:var(--dim);margin-bottom:14px;line-height:1.6;">
-      Analisa berdasarkan: hasil grup, odds bookmaker (FanDuel/FOX Sports 25 Jun 2026),
-      Opta supercomputer, kualitas skuad, form, kondisi pemain &amp; pelatih.
-      <strong style="color:var(--accent);">Diperbarui setelah MD2.</strong>
+      Analisa post-group stage berdasarkan: 72 hasil pertandingan, statistik xG/xA Opta,
+      odds bookmaker terbaru (FOX Sports/DraftKings 28 Jun 2026), kondisi fisik pemain,
+      kualitas squad depth, head coach track record, dan bracket R32.
+      <strong style="color:var(--accent);">Update 28 Jun 2026 — pasca semua grup selesai.</strong>
     </div>
     ${cards}
     <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-top:4px;">
       <div style="font-size:10px;font-weight:700;color:var(--dim);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px;">Tim Berbahaya Lainnya</div>
       <div style="display:flex;flex-wrap:wrap;gap:6px;">
         ${[
-          {t:'England',o:'+650',n:'Kane+Bellingham, Tuchel bawa struktur baru'},
-          {t:'Germany',o:'+1300',n:'7 gol di MD1, Undav super-sub mematikan'},
-          {t:'Netherlands',o:'+1500',n:'Gakpo-Brobbey tajam, Van Dijk kokoh'},
-          {t:'Brazil',o:'+1300',n:'Cunha+Vinicius bangkit, Ancelotti effect'},
-          {t:'Morocco',o:'+4000',n:'Saibari 3 gol, dark horse Afrika'},
+          {t:'France',o:'+550',n:'Mbappe 4G, Dembele hat-trick, tapi kalah Norway MD3 — masih sangat berbahaya'},
+          {t:'Spain',o:'+600',n:'Yamal fit, 5 gol di 3 laga, lolos sempurna — Spain bisa kejutkan siapapun'},
+          {t:'England',o:'+700',n:'Kane 2G, Bellingham gol Panama, performa membaik tiap laga'},
+          {t:'Netherlands',o:'+800',n:'Gakpo+Brobbey tajam, 8 gol grup, kalahkan Morocco bisa buka segalanya'},
+          {t:'Senegal',o:'+3500',n:'5-0 hajar Iraq, Sarr 3G — Afrika terkuat di R32, lawan Belgium'},
         ].map(t=>`
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 10px;min-width:140px;">
             <div style="font-size:13px;">${fl(t.t)} <strong style="font-size:11px;">${t.t}</strong> <span style="font-size:10px;color:var(--accent);">${t.o}</span></div>
