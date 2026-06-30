@@ -1174,7 +1174,7 @@ function renderKnockout(){
             <span class="mbadge">${m.label}</span>
             ${!done&&hasSc?'<span class="mlive-tag">LIVE</span>':''}
             ${done?'<span style="font-size:9px;color:var(--green);font-weight:700;">&#10003; FT'+penInfo+'</span>':''}
-            <span class="mtime">&#9200; ${m.timeWIB} WIB &middot; ${m.venue}</span>
+            <span class="mtime">${m.venue}</span>
           </div>
           <div class="mteam h" style="${hw?'color:var(--green);font-weight:800;':''}">
             ${m.home} <span class="mflag">${fl(m.home)}</span>
