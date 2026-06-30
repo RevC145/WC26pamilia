@@ -639,9 +639,12 @@ let scores = {
   68:{home:2,away:1,done:true,live:false}, // Croatia 2-1 Ghana
 }; // SKOR FINAL — semua 72 grup stage selesai per 28 Jun 2026
 let koScores = {
-  // R32 yang sudah selesai — Canada 1-0 South Africa (Eustaquio 95')
-  73: {home:0, away:1, done:true, live:false},
-}; // knockout scores — auto-update via TheSportsDB
+  // R32 yang sudah dikonfirmasi selesai per 29 Jun 2026
+  // Sumber: Sky Sports, Olympics.com
+  73: {home:0, away:1, done:true, live:false}, // South Africa 0-1 Canada (Eustaquio 95')
+  74: {home:2, away:1, done:true, live:false}, // Brazil 2-1 Japan (Martinelli stoppage time winner)
+  75: {home:1, away:1, done:true, live:false}, // Germany 1-1 Paraguay (Paraguay menang 4-3 penalti — UPSET!)
+}; // knockout scores — auto-update via TheSportsDB untuk sisanya
 let liveMatches = []; // currently live match IDs
 let lastFetch = null;
 let refreshTimer = null;
@@ -857,28 +860,28 @@ function getBest3rd(T){
 }
 
 function getR16(T){
-  // ── BRACKET R32 RESMI FIFA WC 2026 ──
-  // Sumber: NBC Sports, Yahoo Sports, Sky Sports, CBS Sports — verified 28 Jun 2026
-  // Bracket tetap (hardcoded dari hasil draw resmi)
+  // ── BRACKET R32 RESMI FIFA WC 2026 — dengan jam WIB ──
+  // Sumber: Sky Sports (jam ET), NBC Sports, Olympics.com, Yahoo Sports — update 29 Jun 2026
+  // Jam WIB = ET + 11 jam (EDT, hari berikutnya untuk kickoff malam)
   const R32 = [
-    {id:73, home:'South Africa', away:'Canada',      label:'R32 M1',  date:'Jun 28', venue:'Los Angeles',   result:{home:0,away:1,done:true}},
-    {id:74, home:'Brazil',       away:'Japan',        label:'R32 M2',  date:'Jun 29', venue:'Houston',       result:null},
-    {id:75, home:'Germany',      away:'Paraguay',     label:'R32 M3',  date:'Jun 29', venue:'Boston',        result:null},
-    {id:76, home:'Netherlands',  away:'Morocco',      label:'R32 M4',  date:'Jun 29', venue:'Monterrey',     result:null},
-    {id:77, home:'Ivory Coast',  away:'Norway',       label:'R32 M5',  date:'Jun 30', venue:'Dallas',        result:null},
-    {id:78, home:'France',       away:'Sweden',       label:'R32 M6',  date:'Jun 30', venue:'New Jersey',    result:null},
-    {id:79, home:'Mexico',       away:'Ecuador',      label:'R32 M7',  date:'Jun 30', venue:'Mexico City',   result:null},
-    {id:80, home:'England',      away:'DR Congo',     label:'R32 M8',  date:'Jul 1',  venue:'Atlanta',       result:null},
-    {id:81, home:'Belgium',      away:'Senegal',      label:'R32 M9',  date:'Jul 1',  venue:'Seattle',       result:null},
-    {id:82, home:'United States',away:'Bosnia and Herzegovina', label:'R32 M10', date:'Jul 1', venue:'San Francisco', result:null},
-    {id:83, home:'Spain',        away:'Austria',      label:'R32 M11', date:'Jul 2',  venue:'Los Angeles',   result:null},
-    {id:84, home:'Portugal',     away:'Croatia',      label:'R32 M12', date:'Jul 2',  venue:'Toronto',       result:null},
-    {id:85, home:'Switzerland',  away:'Algeria',      label:'R32 M13', date:'Jul 2',  venue:'Vancouver',     result:null},
-    {id:86, home:'Australia',    away:'Egypt',        label:'R32 M14', date:'Jul 3',  venue:'Dallas',        result:null},
-    {id:87, home:'Argentina',    away:'Cape Verde',   label:'R32 M15', date:'Jul 3',  venue:'Miami',         result:null},
-    {id:88, home:'Colombia',     away:'Ghana',        label:'R32 M16', date:'Jul 3',  venue:'Kansas City',   result:null},
+    {id:73, home:'South Africa', away:'Canada',      label:'R32 M1',  date:'29 Jun', timeWIB:'02:00', venue:'Los Angeles',   result:{home:0,away:1,done:true}},
+    {id:74, home:'Brazil',       away:'Japan',        label:'R32 M2',  date:'30 Jun', timeWIB:'00:00', venue:'Houston',       result:{home:2,away:1,done:true}},
+    {id:75, home:'Germany',      away:'Paraguay',     label:'R32 M3',  date:'30 Jun', timeWIB:'03:30', venue:'Boston',        result:{home:1,away:1,done:true,pen:'3-4'}},
+    {id:76, home:'Netherlands',  away:'Morocco',      label:'R32 M4',  date:'30 Jun', timeWIB:'08:00', venue:'Monterrey',     result:null},
+    {id:77, home:'Ivory Coast',  away:'Norway',       label:'R32 M5',  date:'1 Jul',  timeWIB:'00:00', venue:'Dallas',        result:null},
+    {id:78, home:'France',       away:'Sweden',       label:'R32 M6',  date:'1 Jul',  timeWIB:'04:00', venue:'New Jersey',    result:null},
+    {id:79, home:'Mexico',       away:'Ecuador',      label:'R32 M7',  date:'1 Jul',  timeWIB:'08:00', venue:'Mexico City',   result:null},
+    {id:80, home:'England',      away:'DR Congo',     label:'R32 M8',  date:'1 Jul',  timeWIB:'23:00', venue:'Atlanta',       result:null},
+    {id:81, home:'Belgium',      away:'Senegal',      label:'R32 M9',  date:'2 Jul',  timeWIB:'03:00', venue:'Seattle',       result:null},
+    {id:82, home:'United States',away:'Bosnia and Herzegovina', label:'R32 M10', date:'2 Jul', timeWIB:'07:00', venue:'San Francisco', result:null},
+    {id:83, home:'Spain',        away:'Austria',      label:'R32 M11', date:'3 Jul',  timeWIB:'02:00', venue:'Los Angeles',   result:null},
+    {id:84, home:'Portugal',     away:'Croatia',      label:'R32 M12', date:'3 Jul',  timeWIB:'06:00', venue:'Toronto',       result:null},
+    {id:85, home:'Switzerland',  away:'Algeria',      label:'R32 M13', date:'3 Jul',  timeWIB:'10:00', venue:'Vancouver',     result:null},
+    {id:86, home:'Australia',    away:'Egypt',        label:'R32 M14', date:'4 Jul',  timeWIB:'01:00', venue:'Dallas',        result:null},
+    {id:87, home:'Argentina',    away:'Cape Verde',   label:'R32 M15', date:'4 Jul',  timeWIB:'05:00', venue:'Miami',         result:null},
+    {id:88, home:'Colombia',     away:'Ghana',        label:'R32 M16', date:'4 Jul',  timeWIB:'08:30', venue:'Kansas City',   result:null},
   ];
-  // Gabungkan dengan koScores yang datang dari API
+  // Gabungkan dengan koScores yang datang dari API (override hardcoded jika ada data live)
   return R32.map(m => {
     const apiScore = koScores[`${m.home}__${m.away}`] || koScores[`${m.away}__${m.home}`];
     if(apiScore) {
@@ -1148,14 +1151,13 @@ function renderKnockout(){
     : `&#9203; ${doneCount}/12 grup selesai &mdash; bracket diperbarui otomatis saat grup selesai`;
 
   // R32 sebagai jadwal card (mobile-friendly)
-  const r32Days = [
-    {label:'Minggu, 28 Jun', matches:[r16[0]]},
-    {label:'Senin, 29 Jun',  matches:r16.slice(1,4)},
-    {label:'Selasa, 30 Jun', matches:r16.slice(4,7)},
-    {label:'Rabu, 1 Jul',    matches:r16.slice(7,10)},
-    {label:'Kamis, 2 Jul',   matches:r16.slice(10,13)},
-    {label:'Jumat, 3 Jul',   matches:r16.slice(13,16)},
-  ];
+  // Kelompokkan berdasarkan tanggal WIB (karena kickoff malam ET = besok WIB)
+  const dateGroups = {};
+  r16.forEach(m => {
+    if(!dateGroups[m.date]) dateGroups[m.date] = [];
+    dateGroups[m.date].push(m);
+  });
+  const r32Days = Object.entries(dateGroups).map(([date, matches]) => ({label: date+' 2026 (WIB)', matches}));
 
   const r32HTML = r32Days.map(g=>`
     <div class="mday">
@@ -1166,12 +1168,13 @@ function renderKnockout(){
         const done=r?.done;
         const hw=done&&r.home>r.away;
         const aw=done&&r.away>r.home;
+        const penInfo = r?.pen ? ` <span style="font-size:9px;color:var(--accent);">(pen ${r.pen})</span>` : '';
         return `<div class="mrow ${hasSc?'has-score':''}" >
           <div class="mrow-meta">
             <span class="mbadge">${m.label}</span>
             ${!done&&hasSc?'<span class="mlive-tag">LIVE</span>':''}
-            ${done?'<span style="font-size:9px;color:var(--green);font-weight:700;">&#10003; FT</span>':''}
-            <span class="mtime">${m.venue}</span>
+            ${done?'<span style="font-size:9px;color:var(--green);font-weight:700;">&#10003; FT'+penInfo+'</span>':''}
+            <span class="mtime">&#9200; ${m.timeWIB} WIB &middot; ${m.venue}</span>
           </div>
           <div class="mteam h" style="${hw?'color:var(--green);font-weight:800;':''}">
             ${m.home} <span class="mflag">${fl(m.home)}</span>
@@ -1179,7 +1182,7 @@ function renderKnockout(){
           <div class="sbox">
             ${hasSc
               ?'<div class="sv">'+r.home+'&ndash;'+r.away+'</div>'
-              :'<div class="vs">VS</div><div class="vtime">'+m.date+'</div>'}
+              :'<div class="vs">VS</div><div class="vtime">'+m.timeWIB+' WIB</div>'}
           </div>
           <div class="mteam a" style="${aw?'color:var(--green);font-weight:800;':''}">
             <span class="mflag">${fl(m.away)}</span> ${m.away}
@@ -1190,7 +1193,8 @@ function renderKnockout(){
 
   document.getElementById('tab-knockout').innerHTML=`
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
-      <span style="font-size:10px;color:var(--green);">&#10003; Group stage selesai &mdash; Round of 32 berlangsung 28 Jun &ndash; 3 Jul</span>
+      <span style="font-size:10px;color:var(--green);">&#10003; Round of 32 berlangsung &mdash; semua jam ditampilkan WIB</span>
+      <span style="font-size:10px;color:var(--dim);margin-left:auto;">3 laga selesai &middot; 13 laga tersisa</span>
     </div>
     <div class="sec-title">&#127942; Round of 32</div>
     ${r32HTML}
@@ -1308,7 +1312,7 @@ let TOP_SCORERS = [
   {name:'Mohamed Salah',        team:'Egypt',         pos:'FW', goals:2, assists:1, matches:3},
   {name:'Deniz Undav',          team:'Germany',       pos:'FW', goals:2, assists:2, matches:3},
 ];
-let tsLastUpdated = '28 Jun 2026';
+let tsLastUpdated = '29 Jun 2026';
 let tsAutoRefreshed = false;
 
 // ══════════════════════════════════════════════════════
