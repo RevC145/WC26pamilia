@@ -2116,12 +2116,154 @@ function renderPrediction(){
       </div>`).join('');
   }
 }
+
+// ══════════════════════════════════════════════════════
+//  RENDER: PREDICTION
+// ══════════════════════════════════════════════════════
+function renderPrediction(){
+  const el = document.getElementById('tab-prediction');
+  if(!el) return;
+  const cards = PREDICTIONS.map(p => {
+    const formHtml = p.form.map(f =>
+      `<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;font-size:9px;font-weight:700;background:${f==='W'?'rgba(34,197,94,.2)':f==='D'?'rgba(245,197,24,.2)':'rgba(239,68,68,.2)'};color:${f==='W'?'var(--green)':f==='D'?'var(--accent)':'var(--red)'};">${f}</span>`
+    ).join('');
+    const players = p.keyPlayers.map(kp =>
+      `<div style="background:var(--surface);border-radius:6px;padding:6px 8px;display:flex;gap:6px;align-items:flex-start;">
+        <span style="font-size:9px;font-weight:700;background:${kp.pos==='FW'?'rgba(239,68,68,.15)':kp.pos==='MF'?'rgba(58,123,213,.15)':kp.pos==='DF'?'rgba(34,197,94,.15)':'rgba(245,197,24,.15)'};color:${kp.pos==='FW'?'var(--red)':kp.pos==='MF'?'var(--accent2)':kp.pos==='DF'?'var(--green)':'var(--accent)'};border-radius:3px;padding:1px 4px;flex-shrink:0;margin-top:1px;">${kp.pos}</span>
+        <div><div style="font-size:11px;font-weight:600;">${kp.name}</div><div style="font-size:9px;color:var(--dim);">${kp.note}</div></div>
+      </div>`
+    ).join('');
+    const strengths = p.strengths.map(s => `<li style="margin-bottom:3px;">&#9989; ${s}</li>`).join('');
+    const concerns = p.concerns.map(s => `<li style="margin-bottom:3px;">&#9888;&#65039; ${s}</li>`).join('');
+    return `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:16px;">
+      <div style="background:linear-gradient(135deg,var(--surface),var(--card));padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;">
+        <div style="font-size:48px;line-height:1;">${fl(p.team)}</div>
+        <div style="flex:1;">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;">${p.team}</span>
+            <span style="font-size:10px;font-weight:700;background:${p.badgeColor}22;color:${p.badgeColor};border:1px solid ${p.badgeColor}44;border-radius:4px;padding:2px 7px;">${p.badge}</span>
+          </div>
+          <div style="display:flex;gap:12px;margin-top:4px;flex-wrap:wrap;">
+            <span style="font-size:11px;color:var(--dim);">Odds: <strong style="color:var(--accent);">${p.odds}</strong></span>
+            <span style="font-size:11px;color:var(--dim);">Peluang: <strong style="color:var(--green);">${p.probability}</strong></span>
+            <span style="font-size:11px;color:var(--dim);">GF/GA: <strong>${p.gf}/${p.ga}</strong></span>
+            <span style="font-size:11px;color:var(--dim);">Form: ${formHtml}</span>
+          </div>
+          <div style="font-size:10px;color:var(--dim);margin-top:3px;">&#128101; ${p.coach}</div>
+        </div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--accent);line-height:1;">#${p.rank}</div>
+      </div>
+      <div style="padding:14px 16px;">
+        <div style="font-size:12px;color:var(--text);line-height:1.7;margin-bottom:12px;border-left:3px solid ${p.badgeColor};padding-left:10px;">${p.analysis}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+          <div>
+            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--green);margin-bottom:5px;">Kekuatan</div>
+            <ul style="list-style:none;padding:0;font-size:11px;color:var(--text);line-height:1.6;">${strengths}</ul>
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--orange);margin-bottom:5px;">Risiko</div>
+            <ul style="list-style:none;padding:0;font-size:11px;color:var(--text);line-height:1.6;">${concerns}</ul>
+          </div>
+        </div>
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--dim);margin-bottom:6px;">Pemain Kunci</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:5px;margin-bottom:10px;">${players}</div>
+        <div style="background:var(--surface);border-radius:6px;padding:8px 10px;font-size:10px;color:var(--dim);">
+          &#128506; ${p.route}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="sec-title">&#128302; Prediksi Potensi Juara</div>
+    <div style="font-size:10px;color:var(--dim);margin-bottom:14px;line-height:1.6;">
+      Analisa post-group stage &bull; Odds FOX Sports/DraftKings 28 Jun 2026 &bull; Opta supercomputer &bull; <strong style="color:var(--accent);">Update 1 Jul 2026</strong>
+    </div>
+    ${cards}
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-top:4px;">
+      <div style="font-size:10px;font-weight:700;color:var(--dim);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px;">Tim Berbahaya Lainnya di R16</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        ${[
+          {t:'France',o:'+490',n:'Mbappe brace vs Sweden — balik ke jalur juara setelah kalah Norway'},
+          {t:'Spain',o:'+520',n:'Yamal gol, 3-1 vs Austria — Rodri+Pedri dominasi midfield'},
+          {t:'England',o:'+650',n:'Kane+Bellingham 3-1 vs DR Congo — performa terbaik turnamen ini'},
+          {t:'Senegal',o:'+2800',n:'KEJUTAN: Kalahkan Belgium 2-1 — Sarr+Dia tajam, momen Afrika'},
+          {t:'Morocco',o:'+2500',n:'Eliminasi Belanda via penalti — dark horse sesungguhnya'},
+        ].map(t=>`
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 10px;min-width:140px;">
+            <div style="font-size:13px;">${fl(t.t)} <strong style="font-size:11px;">${t.t}</strong> <span style="font-size:10px;color:var(--accent);">${t.o}</span></div>
+            <div style="font-size:9px;color:var(--dim);margin-top:2px;">${t.n}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+    <div style="font-size:9px;color:var(--dim);margin-top:12px;text-align:center;">
+      Odds per 28 Jun 2026 via FanDuel/DraftKings. Bukan saran taruhan.
+    </div>`;
+}
+
+// ══════════════════════════════════════════════════════
+//  NAV — showTab
+// ══════════════════════════════════════════════════════
+function showTab(id, btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  document.querySelectorAll('.desktop-nav button').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.bn-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  const isMobile = btn && btn.closest('.bottom-nav');
+  if(isMobile){
+    document.querySelectorAll('.desktop-nav button').forEach(b=>{
+      if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+id+"'")) b.classList.add('active');
+    });
+  } else {
+    document.querySelectorAll(`.bn-btn[data-tab="${id}"]`).forEach(b=>b.classList.add('active'));
+  }
+  if(id==='highlights'){ if(!hlFetched){ fetchHighlights(); } else { renderHighlights(); } }
+  if(id==='prediction') renderPrediction();
+}
+
+// ══════════════════════════════════════════════════════
+//  PROGRESS BADGE
+// ══════════════════════════════════════════════════════
+function updateBadge(){
+  const played = Object.keys(koScores).filter(k=>koScores[k].done).length;
+  const badge = document.getElementById('progress-badge');
+  badge.textContent = played >= 16 ? 'R16' : played + ' R32';
+  badge.style.background = played>=16?'var(--accent2)':'var(--green)';
+}
+
+// ══════════════════════════════════════════════════════
+//  RENDER ALL
+// ══════════════════════════════════════════════════════
+function renderAll(){
+  renderOverview();
+  renderGroups();
+  renderSchedule();
+  renderKnockout();
+  renderStats();
+  renderPrediction();
+  updateBadge();
+}
+
+// ══════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════
+renderAll();
+fetchAllFixtures();
+setTimeout(()=>refreshTopScorers(false), 3000);
+document.addEventListener('visibilitychange', ()=>{
+  if(document.visibilityState==='visible'){
+    const elapsed = lastFetch ? Date.now()-lastFetch : Infinity;
+    if(elapsed > 60000) fetchAllFixtures();
+  }
+});
 </script>
 
 <!--
 ╔══════════════════════════════════════════════════════════════╗
 ║     WC 2026 Dashboard — update 1 Jul 2026                   ║
-║     R32 selesai, R16 mulai 5 Jul 2026                       ║
+║     R32 selesai semua, R16 mulai 5 Jul 2026                 ║
 ╚══════════════════════════════════════════════════════════════╝
 -->
 </body>
