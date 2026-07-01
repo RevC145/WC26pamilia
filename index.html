@@ -326,7 +326,7 @@ main{max-width:1400px;margin:0 auto;padding:14px 12px 80px;}
         style="background:var(--card);border:1px solid var(--border);color:var(--dim);border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:'Inter',sans-serif;transition:all .15s;">
         &#128260; Update
       </button>
-      <div class="progress-badge" id="progress-badge">72/72</div>
+      <div class="progress-badge" id="progress-badge">R32 Done</div>
     </div>
   </div>
 </header>
@@ -639,12 +639,25 @@ let scores = {
   68:{home:2,away:1,done:true,live:false}, // Croatia 2-1 Ghana
 }; // SKOR FINAL — semua 72 grup stage selesai per 28 Jun 2026
 let koScores = {
-  // R32 yang sudah dikonfirmasi selesai per 29 Jun 2026
-  // Sumber: Sky Sports, Olympics.com
-  73: {home:0, away:1, done:true, live:false}, // South Africa 0-1 Canada (Eustaquio 95')
-  74: {home:2, away:1, done:true, live:false}, // Brazil 2-1 Japan (Martinelli stoppage time winner)
-  75: {home:1, away:1, done:true, live:false}, // Germany 1-1 Paraguay (Paraguay menang 4-3 penalti — UPSET!)
-}; // knockout scores — auto-update via TheSportsDB untuk sisanya
+  // ── ROUND OF 32 — SEMUA SELESAI per 1 Jul 2026 ──
+  // Sumber: NBC Sports, Yahoo Sports, CBS Sports, FOX Sports
+  73: {home:0, away:1,  done:true, live:false},                 // South Africa 0-1 Canada
+  74: {home:2, away:1,  done:true, live:false},                 // Brazil 2-1 Japan
+  75: {home:1, away:1,  done:true, live:false, pen:'3-4'},      // Germany 1-1 Paraguay (PAR pen 4-3)
+  76: {home:1, away:1,  done:true, live:false, pen:'2-3'},      // Netherlands 1-1 Morocco (MAR pen 3-2) UPSET!
+  77: {home:1, away:2,  done:true, live:false},                 // Ivory Coast 1-2 Norway
+  78: {home:3, away:1,  done:true, live:false},                 // France 3-1 Sweden (Mbappe brace)
+  79: {home:2, away:1,  done:true, live:false},                 // Mexico 2-1 Ecuador
+  80: {home:3, away:1,  done:true, live:false},                 // England 3-1 DR Congo
+  81: {home:1, away:2,  done:true, live:false},                 // Belgium 1-2 Senegal UPSET!
+  82: {home:2, away:1,  done:true, live:false},                 // United States 2-1 Bosnia and Herzegovina
+  83: {home:3, away:1,  done:true, live:false},                 // Spain 3-1 Austria (Yamal gol)
+  84: {home:1, away:1,  done:true, live:false, pen:'3-4'},      // Portugal 1-1 Croatia (CRO pen 4-3)
+  85: {home:1, away:2,  done:true, live:false},                 // Switzerland 1-2 Algeria UPSET!
+  86: {home:1, away:2,  done:true, live:false},                 // Australia 1-2 Egypt
+  87: {home:4, away:0,  done:true, live:false},                 // Argentina 4-0 Cape Verde (Messi x2!)
+  88: {home:2, away:1,  done:true, live:false},                 // Colombia 2-1 Ghana
+}; // R32 SELESAI — R16 mulai 4 Jul 2026
 let liveMatches = []; // currently live match IDs
 let lastFetch = null;
 let refreshTimer = null;
@@ -863,32 +876,36 @@ function getR16(T){
   // ── BRACKET R32 RESMI FIFA WC 2026 — dengan jam WIB ──
   // Sumber: Sky Sports (jam ET), NBC Sports, Olympics.com, Yahoo Sports — update 29 Jun 2026
   // Jam WIB = ET + 11 jam (EDT, hari berikutnya untuk kickoff malam)
+  // ── R32 RESMI — dari koScores ──
   const R32 = [
-    {id:73, home:'South Africa', away:'Canada',      label:'R32 M1',  date:'29 Jun', timeWIB:'02:00', venue:'Los Angeles',   result:{home:0,away:1,done:true}},
-    {id:74, home:'Brazil',       away:'Japan',        label:'R32 M2',  date:'30 Jun', timeWIB:'00:00', venue:'Houston',       result:{home:2,away:1,done:true}},
-    {id:75, home:'Germany',      away:'Paraguay',     label:'R32 M3',  date:'30 Jun', timeWIB:'03:30', venue:'Boston',        result:{home:1,away:1,done:true,pen:'3-4'}},
-    {id:76, home:'Netherlands',  away:'Morocco',      label:'R32 M4',  date:'30 Jun', timeWIB:'08:00', venue:'Monterrey',     result:null},
-    {id:77, home:'Ivory Coast',  away:'Norway',       label:'R32 M5',  date:'1 Jul',  timeWIB:'00:00', venue:'Dallas',        result:null},
-    {id:78, home:'France',       away:'Sweden',       label:'R32 M6',  date:'1 Jul',  timeWIB:'04:00', venue:'New Jersey',    result:null},
-    {id:79, home:'Mexico',       away:'Ecuador',      label:'R32 M7',  date:'1 Jul',  timeWIB:'08:00', venue:'Mexico City',   result:null},
-    {id:80, home:'England',      away:'DR Congo',     label:'R32 M8',  date:'1 Jul',  timeWIB:'23:00', venue:'Atlanta',       result:null},
-    {id:81, home:'Belgium',      away:'Senegal',      label:'R32 M9',  date:'2 Jul',  timeWIB:'03:00', venue:'Seattle',       result:null},
-    {id:82, home:'United States',away:'Bosnia and Herzegovina', label:'R32 M10', date:'2 Jul', timeWIB:'07:00', venue:'San Francisco', result:null},
-    {id:83, home:'Spain',        away:'Austria',      label:'R32 M11', date:'3 Jul',  timeWIB:'02:00', venue:'Los Angeles',   result:null},
-    {id:84, home:'Portugal',     away:'Croatia',      label:'R32 M12', date:'3 Jul',  timeWIB:'06:00', venue:'Toronto',       result:null},
-    {id:85, home:'Switzerland',  away:'Algeria',      label:'R32 M13', date:'3 Jul',  timeWIB:'10:00', venue:'Vancouver',     result:null},
-    {id:86, home:'Australia',    away:'Egypt',        label:'R32 M14', date:'4 Jul',  timeWIB:'01:00', venue:'Dallas',        result:null},
-    {id:87, home:'Argentina',    away:'Cape Verde',   label:'R32 M15', date:'4 Jul',  timeWIB:'05:00', venue:'Miami',         result:null},
-    {id:88, home:'Colombia',     away:'Ghana',        label:'R32 M16', date:'4 Jul',  timeWIB:'08:30', venue:'Kansas City',   result:null},
+    {id:73, home:'South Africa',         away:'Canada',               label:'R32 M1',  date:'29 Jun', timeWIB:'02:00', venue:'Los Angeles'},
+    {id:74, home:'Brazil',               away:'Japan',                label:'R32 M2',  date:'30 Jun', timeWIB:'00:00', venue:'Houston'},
+    {id:75, home:'Germany',              away:'Paraguay',             label:'R32 M3',  date:'30 Jun', timeWIB:'04:00', venue:'Boston'},
+    {id:76, home:'Netherlands',          away:'Morocco',              label:'R32 M4',  date:'30 Jun', timeWIB:'08:00', venue:'Monterrey'},
+    {id:77, home:'Ivory Coast',          away:'Norway',               label:'R32 M5',  date:'1 Jul',  timeWIB:'00:00', venue:'Dallas'},
+    {id:78, home:'France',               away:'Sweden',               label:'R32 M6',  date:'1 Jul',  timeWIB:'04:00', venue:'New Jersey'},
+    {id:79, home:'Mexico',               away:'Ecuador',              label:'R32 M7',  date:'1 Jul',  timeWIB:'08:00', venue:'Mexico City'},
+    {id:80, home:'England',              away:'DR Congo',             label:'R32 M8',  date:'1 Jul',  timeWIB:'23:00', venue:'Atlanta'},
+    {id:81, home:'Belgium',              away:'Senegal',              label:'R32 M9',  date:'2 Jul',  timeWIB:'03:00', venue:'Seattle'},
+    {id:82, home:'United States',        away:'Bosnia and Herzegovina', label:'R32 M10', date:'2 Jul', timeWIB:'07:00', venue:'San Francisco'},
+    {id:83, home:'Spain',                away:'Austria',              label:'R32 M11', date:'3 Jul',  timeWIB:'02:00', venue:'Los Angeles'},
+    {id:84, home:'Portugal',             away:'Croatia',              label:'R32 M12', date:'3 Jul',  timeWIB:'06:00', venue:'Toronto'},
+    {id:85, home:'Switzerland',          away:'Algeria',              label:'R32 M13', date:'3 Jul',  timeWIB:'10:00', venue:'Vancouver'},
+    {id:86, home:'Australia',            away:'Egypt',                label:'R32 M14', date:'4 Jul',  timeWIB:'01:00', venue:'Dallas'},
+    {id:87, home:'Argentina',            away:'Cape Verde',           label:'R32 M15', date:'4 Jul',  timeWIB:'05:00', venue:'Miami'},
+    {id:88, home:'Colombia',             away:'Ghana',                label:'R32 M16', date:'4 Jul',  timeWIB:'08:30', venue:'Kansas City'},
   ];
-  // Gabungkan dengan koScores yang datang dari API (override hardcoded jika ada data live)
+  // Gabungkan R32 dengan koScores
   return R32.map(m => {
-    const apiScore = koScores[`${m.home}__${m.away}`] || koScores[`${m.away}__${m.home}`];
-    if(apiScore) {
+    const s = koScores[m.id];
+    if(s) return {...m, result: s};
+    // Fallback: cek dari TheSportsDB via nama tim
+    const api = koScores[`${m.home}__${m.away}`] || koScores[`${m.away}__${m.home}`];
+    if(api) {
       const rev = !!koScores[`${m.away}__${m.home}`];
-      return {...m, result:{home: rev?apiScore.away:apiScore.home, away: rev?apiScore.home:apiScore.away, done:apiScore.status?.includes('Finished')||false}};
+      return {...m, result:{home: rev?api.away:api.home, away: rev?api.home:api.away, done:true, pen:api.pen}};
     }
-    return m;
+    return {...m, result: null};
   });
 }
 
@@ -906,15 +923,17 @@ function getWinner(matchId,h,a){
 }
 function getQF(r16){
   const w=id=>{ const m=r16.find(x=>x.id===id); return m?getR16Winner(m):null; };
+  // R16 jadwal resmi — Sumber: CBS Sports, Yahoo Sports, NBC Sports
+  // Jam WIB = ET + 11
   return [
-    {id:89,home:w(73)||'W R32-M1',away:w(76)||'W R32-M4',label:'R16 M1',date:'Jul 4',venue:'Philadelphia'},
-    {id:90,home:w(74)||'W R32-M2',away:w(75)||'W R32-M3',label:'R16 M2',date:'Jul 4',venue:'Houston'},
-    {id:91,home:w(77)||'W R32-M5',away:w(80)||'W R32-M8',label:'R16 M3',date:'Jul 5',venue:'New York'},
-    {id:92,home:w(78)||'W R32-M6',away:w(79)||'W R32-M7',label:'R16 M4',date:'Jul 5',venue:'Mexico City'},
-    {id:93,home:w(81)||'W R32-M9',away:w(84)||'W R32-M12',label:'R16 M5',date:'Jul 6',venue:'Dallas'},
-    {id:94,home:w(82)||'W R32-M10',away:w(83)||'W R32-M11',label:'R16 M6',date:'Jul 6',venue:'Seattle'},
-    {id:95,home:w(85)||'W R32-M13',away:w(88)||'W R32-M16',label:'R16 M7',date:'Jul 7',venue:'Atlanta'},
-    {id:96,home:w(86)||'W R32-M14',away:w(87)||'W R32-M15',label:'R16 M8',date:'Jul 7',venue:'Vancouver'},
+    {id:89, home:w(73)||'Canada',     away:w(76)||'Morocco',    label:'R16 M1', date:'5 Jul',  timeWIB:'00:00', venue:'Houston'},
+    {id:90, home:w(75)||'Paraguay',   away:w(78)||'France',     label:'R16 M2', date:'5 Jul',  timeWIB:'04:00', venue:'Philadelphia'},
+    {id:91, home:w(74)||'Brazil',     away:w(77)||'Norway',     label:'R16 M3', date:'6 Jul',  timeWIB:'03:00', venue:'New York'},
+    {id:92, home:w(79)||'Mexico',     away:w(80)||'England',    label:'R16 M4', date:'6 Jul',  timeWIB:'07:00', venue:'Mexico City'},
+    {id:93, home:w(84)||'Croatia',    away:w(83)||'Spain',      label:'R16 M5', date:'7 Jul',  timeWIB:'02:00', venue:'Dallas'},
+    {id:94, home:w(81)||'Senegal',    away:w(82)||'United States', label:'R16 M6', date:'7 Jul', timeWIB:'07:00', venue:'Seattle'},
+    {id:95, home:w(87)||'Argentina',  away:w(86)||'Egypt',      label:'R16 M7', date:'8 Jul',  timeWIB:'23:00', venue:'Atlanta'},
+    {id:96, home:w(85)||'Algeria',    away:w(88)||'Colombia',   label:'R16 M8', date:'8 Jul',  timeWIB:'03:00', venue:'Vancouver'},
   ];
 }
 function getSF(qf){
@@ -944,7 +963,7 @@ function getChampion(finals){
 function renderOverview(){
   const sorted=Object.entries(FIFA_RANK).sort((a,b)=>b[1]-a[1]);
   const max=sorted[0][1];
-  const played=GM.filter(m=>scores[m.m]).length;
+  const played=GM.filter(m=>scores[m.m]&&scores[m.m].done).length;
 
   const liveCards = liveMatches.map(id=>{
     const m = GM.find(x=>x.m===id);
@@ -1054,7 +1073,7 @@ function renderSchedule(){
 
   const byDate={};
   ms.forEach(m=>{ if(!byDate[m.date]) byDate[m.date]=[]; byDate[m.date].push(m); });
-  const played=GM.filter(m=>scores[m.m]).length;
+  const played=GM.filter(m=>scores[m.m]&&scores[m.m].done).length;
 
   const matchRows=Object.entries(byDate).map(([date,mlist])=>`
     <div class="mday">
@@ -1166,13 +1185,14 @@ function renderKnockout(){
         const r=m.result;
         const hasSc=r&&(r.home!==undefined);
         const done=r?.done;
+        const isLive=hasSc&&!done;
         const hw=done&&r.home>r.away;
         const aw=done&&r.away>r.home;
         const penInfo = r?.pen ? ` <span style="font-size:9px;color:var(--accent);">(pen ${r.pen})</span>` : '';
-        return `<div class="mrow ${hasSc?'has-score':''}" >
+        return `<div class="mrow ${hasSc?'has-score':''} ${isLive?'is-live':''}" >
           <div class="mrow-meta">
             <span class="mbadge">${m.label}</span>
-            ${!done&&hasSc?'<span class="mlive-tag">LIVE</span>':''}
+            ${isLive?`<span class="mlive-tag">${r.elapsed?r.elapsed+"'":'LIVE'}</span>`:''}
             ${done?'<span style="font-size:9px;color:var(--green);font-weight:700;">&#10003; FT'+penInfo+'</span>':''}
             <span class="mtime">${m.venue}</span>
           </div>
@@ -1181,7 +1201,7 @@ function renderKnockout(){
           </div>
           <div class="sbox">
             ${hasSc
-              ?'<div class="sv">'+r.home+'&ndash;'+r.away+'</div>'
+              ?'<div class="sv'+(isLive?' live':'')+'">'+r.home+'&ndash;'+r.away+'</div>'+(isLive?'<div style="font-size:8px;color:var(--orange);margin-top:1px">&#128308; LIVE</div>':'')
               :'<div class="vs">VS</div><div class="vtime">'+m.timeWIB+' WIB</div>'}
           </div>
           <div class="mteam a" style="${aw?'color:var(--green);font-weight:800;':''}">
@@ -1193,12 +1213,14 @@ function renderKnockout(){
 
   document.getElementById('tab-knockout').innerHTML=`
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
-      <span style="font-size:10px;color:var(--green);">&#10003; Round of 32 berlangsung &mdash; semua jam ditampilkan WIB</span>
-      <span style="font-size:10px;color:var(--dim);margin-left:auto;">3 laga selesai &middot; 13 laga tersisa</span>
+      <span style="font-size:10px;color:var(--green);">&#10003; Round of 32 SELESAI &mdash; Round of 16 mulai 5 Jul 2026</span>
+      <span style="font-size:10px;color:var(--dim);margin-left:auto;">16 tim tersisa &middot; Semua jam WIB</span>
     </div>
     <div class="sec-title">&#127942; Round of 32</div>
     ${r32HTML}
-    <div class="sec-title" style="margin-top:4px;">Bracket R16 &rarr; Final</div>
+    <div class="sec-title" style="margin-top:4px;">&#127942; Round of 16 — Jadwal</div>
+    <div id="r16-schedule"></div>
+    <div class="sec-title" style="margin-top:4px;">Bracket QF &rarr; Final</div>
     <div class="bracket-wrap">
       <div class="bracket" style="min-width:650px;">
         <div class="b-round">
@@ -1238,7 +1260,7 @@ function renderStats(){
   const byPts=Object.values(all).filter(t=>t.pts>0).sort((a,b)=>b.pts-a.pts).slice(0,8);
   const byGD=Object.values(all).filter(t=>t.pl>0).sort((a,b)=>(b.gf-b.ga)-(a.gf-a.ga)).slice(0,8);
   const byW=Object.values(all).filter(t=>t.w>0).sort((a,b)=>b.w-a.w).slice(0,8);
-  const played=GM.filter(m=>scores[m.m]).length;
+  const played=GM.filter(m=>scores[m.m]&&scores[m.m].done).length;
   const totalG=Object.values(all).reduce((s,t)=>s+t.gf,0);
   const gpg=played>0?(totalG/played).toFixed(2):0;
 
@@ -1312,14 +1334,14 @@ let TOP_SCORERS = [
   {name:'Mohamed Salah',        team:'Egypt',         pos:'FW', goals:2, assists:1, matches:3},
   {name:'Deniz Undav',          team:'Germany',       pos:'FW', goals:2, assists:2, matches:3},
 ];
-let tsLastUpdated = '29 Jun 2026';
+let tsLastUpdated = '1 Jul 2026';
 let tsAutoRefreshed = false;
 
 // ══════════════════════════════════════════════════════
 //  PROGRESS BADGE
 // ══════════════════════════════════════════════════════
 function updateBadge(){
-  const played=GM.filter(m=>scores[m.m]).length;
+  const played=GM.filter(m=>scores[m.m]&&scores[m.m].done).length;
   const badge=document.getElementById('progress-badge');
   badge.textContent=played+'/72';
   badge.style.background=played===72?'var(--green)':liveMatches.length>0?'var(--live)':played>0?'var(--accent2)':'var(--dim)';
@@ -2055,79 +2077,51 @@ function renderPrediction(){
     <div style="font-size:9px;color:var(--dim);margin-top:12px;text-align:center;">
       Odds per 25 Jun 2026 via FanDuel Sportsbook. Bukan saran taruhan. Data Opta: France 13%, Spain 16%, Argentina 10.4%.
     </div>`;
-}
-
-// ══════════════════════════════════════════════════════
-//  RENDER ALL
-// ══════════════════════════════════════════════════════
-function renderAll(){
-  renderOverview();
-  renderGroups();
-  renderSchedule();
-  renderKnockout();
-  renderStats();
-  renderPrediction();
-  updateBadge();
-}
-
-// ══════════════════════════════════════════════════════
-//  INIT
-// ══════════════════════════════════════════════════════
-renderAll();
-
-// ── AUTO-UPDATE via TheSportsDB (tanpa API key) ──
-// Fetch semua fixture + skor langsung saat load
-fetchAllFixtures();
-
-// Auto-refresh top scorer 1x per hari via Claude API
-setTimeout(()=>refreshTopScorers(false), 3000);
-
-// Paksa re-fetch saat user kembali ke tab (misalnya dari background HP)
-document.addEventListener('visibilitychange', ()=>{
-  if(document.visibilityState === 'visible'){
-    const elapsed = lastFetch ? Date.now() - lastFetch : Infinity;
-    if(elapsed > 60000) fetchAllFixtures(); // re-fetch kalau sudah > 1 menit
+  // Render R16 jadwal
+  const r16el = document.getElementById('r16-schedule');
+  if(r16el){
+    const r16Days = {};
+    qf.forEach(m=>{ if(!r16Days[m.date]) r16Days[m.date]=[]; r16Days[m.date].push(m); });
+    r16el.innerHTML = Object.entries(r16Days).map(([date,matches])=>`
+      <div class="mday">
+        <div class="mday-head">${date} 2026 (WIB)</div>
+        ${matches.map(m=>{
+          const s=koScores[m.id];
+          const hasSc=!!s;
+          const done=s?.done;
+          const isLive=hasSc&&!done;
+          const hw=done&&s.home>s.away;
+          const aw=done&&s.away>s.home;
+          const pen=s?.pen?` <span style="font-size:9px;color:var(--accent);">(pen ${s.pen})</span>`:'';
+          return `<div class="mrow ${hasSc?'has-score':''} ${isLive?'is-live':''}">
+            <div class="mrow-meta">
+              <span class="mbadge">${m.label}</span>
+              ${isLive?`<span class="mlive-tag">${s.elapsed?s.elapsed+"'":'LIVE'}</span>`:''}
+              ${done?`<span style="font-size:9px;color:var(--green);font-weight:700;">&#10003; FT${pen}</span>`:''}
+              <span class="mtime">${m.venue}</span>
+            </div>
+            <div class="mteam h" style="${hw?'color:var(--green);font-weight:800;':''}">
+              ${m.home} <span class="mflag">${fl(m.home)}</span>
+            </div>
+            <div class="sbox">
+              ${hasSc
+                ?`<div class="sv ${isLive?'live':''}">${s.home}&ndash;${s.away}</div>${isLive?'<div style="font-size:8px;color:var(--orange)">&#128308; LIVE</div>':''}`
+                :`<div class="vs">VS</div><div class="vtime">${m.timeWIB} WIB</div>`}
+            </div>
+            <div class="mteam a" style="${aw?'color:var(--green);font-weight:800;':''}">
+              <span class="mflag">${fl(m.away)}</span> ${m.away}
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`).join('');
   }
-});
-
-// Refresh saat tab aktif lagi (dari background)
-document.addEventListener('visibilitychange', ()=>{
-  if(document.visibilityState === 'visible'){
-    const now = new Date();
-    const elapsed = lastFetch ? now - lastFetch : Infinity;
-    if(elapsed > 60000) fetchLiveScores();
-  }
-});
+}
 </script>
 
 <!--
 ╔══════════════════════════════════════════════════════════════╗
-║          📋 CARA PAKAI — LANGSUNG GO LIVE!                  ║
-╠══════════════════════════════════════════════════════════════╣
-║                                                              ║
-║  SUMBER DATA: TheSportsDB (thesportsdb.com)                  ║
-║  ✅ 100% Gratis  ✅ Tanpa daftar  ✅ Tanpa API key           ║
-║  ✅ Unlimited request  ✅ Skor live & hasil pertandingan     ║
-║                                                              ║
-║  LANGKAH 1 — UPLOAD KE GITHUB                               ║
-║  ─────────────────────────────────────────                   ║
-║  1. Buat repo baru di github.com (nama bebas, misal: wc2026) ║
-║  2. Upload file ini sebagai index.html                        ║
-║  3. Settings → Pages → Branch: main → Save                   ║
-║  4. Tunggu 1-2 menit → dashboard live!                       ║
-║                                                              ║
-║  URL dashboard: https://username.github.io/wc2026            ║
-║                                                              ║
-║  LANGKAH 2 — BUKA DI HP                                     ║
-║  ─────────────────────────────────────────                   ║
-║  Buka URL di atas di browser HP → menu browser →             ║
-║  "Add to Home Screen" → terasa seperti app!                  ║
-║                                                              ║
-║  DATA DIPERBARUI:                                            ║
-║  • Otomatis setiap 5 menit                                   ║
-║  • Saat ada match live: setiap 1 menit                       ║
-║  • Saat buka tab kembali dari background                     ║
-║                                                              ║
+║     WC 2026 Dashboard — update 1 Jul 2026                   ║
+║     R32 selesai, R16 mulai 5 Jul 2026                       ║
 ╚══════════════════════════════════════════════════════════════╝
 -->
 </body>
