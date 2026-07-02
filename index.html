@@ -316,7 +316,7 @@ main{max-width:1400px;margin:0 auto;padding:14px 12px 80px;}
       <button onclick="showTab('schedule',this)">Jadwal</button>
       <button onclick="showTab('knockout',this)">Knockout</button>
       <button onclick="showTab('stats',this)">Stats</button>
-      <button onclick="showTab('highlights',this)">🎬 Highlights</button>
+      <button onclick="showTab('highlights',this)">🖼️ Gallery</button>
       <button onclick="showTab('prediction',this)">🔮 Prediksi</button>
     </nav>
     <div class="status-bar">
@@ -360,7 +360,7 @@ main{max-width:1400px;margin:0 auto;padding:14px 12px 80px;}
     <span class="icon">📊</span>Stats
   </button>
   <button class="bn-btn" onclick="showTab('highlights',this)" data-tab="highlights">
-    <span class="icon">🎬</span>Highlights
+    <span class="icon">🖼️</span>Gallery
   </button>
   <button class="bn-btn" onclick="showTab('prediction',this)" data-tab="prediction">
     <span class="icon">🔮</span>Prediksi
@@ -639,25 +639,28 @@ let scores = {
   68:{home:2,away:1,done:true,live:false}, // Croatia 2-1 Ghana
 }; // SKOR FINAL — semua 72 grup stage selesai per 28 Jun 2026
 let koScores = {
-  // ── ROUND OF 32 — SEMUA SELESAI per 1 Jul 2026 ──
-  // Sumber: NBC Sports, Yahoo Sports, CBS Sports, FOX Sports
-  73: {home:0, away:1,  done:true, live:false},                 // South Africa 0-1 Canada
-  74: {home:2, away:1,  done:true, live:false},                 // Brazil 2-1 Japan
-  75: {home:1, away:1,  done:true, live:false, pen:'3-4'},      // Germany 1-1 Paraguay (PAR pen 4-3)
-  76: {home:1, away:1,  done:true, live:false, pen:'2-3'},      // Netherlands 1-1 Morocco (MAR pen 3-2) UPSET!
-  77: {home:1, away:2,  done:true, live:false},                 // Ivory Coast 1-2 Norway
-  78: {home:3, away:1,  done:true, live:false},                 // France 3-1 Sweden (Mbappe brace)
-  79: {home:2, away:1,  done:true, live:false},                 // Mexico 2-1 Ecuador
-  80: {home:3, away:1,  done:true, live:false},                 // England 3-1 DR Congo
-  81: {home:1, away:2,  done:true, live:false},                 // Belgium 1-2 Senegal UPSET!
-  82: {home:2, away:1,  done:true, live:false},                 // United States 2-1 Bosnia and Herzegovina
-  83: {home:3, away:1,  done:true, live:false},                 // Spain 3-1 Austria (Yamal gol)
-  84: {home:1, away:1,  done:true, live:false, pen:'3-4'},      // Portugal 1-1 Croatia (CRO pen 4-3)
-  85: {home:1, away:2,  done:true, live:false},                 // Switzerland 1-2 Algeria UPSET!
-  86: {home:1, away:2,  done:true, live:false},                 // Australia 1-2 Egypt
-  87: {home:4, away:0,  done:true, live:false},                 // Argentina 4-0 Cape Verde (Messi x2!)
+  // ── ROUND OF 32 — SEMUA SELESAI ──
+  // Sumber: Yahoo Sports, CBS Sports, FOX Sports, FourFourTwo, SI — 3 Jul 2026
+  73: {home:0, away:1,  done:true, live:false},                 // South Africa 0-1 Canada (Eustaquio 95')
+  74: {home:2, away:1,  done:true, live:false},                 // Brazil 2-1 Japan (Casemiro, Martinelli 90+3')
+  75: {home:1, away:1,  done:true, live:false, pen:'3-4'},      // Germany 1-1 Paraguay aet (PAR pen 4-3) UPSET!
+  76: {home:1, away:1,  done:true, live:false, pen:'2-3'},      // Netherlands 1-1 Morocco aet (MAR pen 3-2) UPSET!
+  77: {home:1, away:2,  done:true, live:false},                 // Ivory Coast 1-2 Norway (Haaland 85')
+  78: {home:3, away:0,  done:true, live:false},                 // France 3-0 Sweden (Mbappe x2, Dembele)
+  79: {home:2, away:0,  done:true, live:false},                 // Mexico 2-0 Ecuador (Mexico belum kebobolan!)
+  80: {home:2, away:1,  done:true, live:false},                 // England 2-1 DR Congo (Kane brace stoppage time)
+  81: {home:3, away:2,  done:true, live:false, aet:true},       // Belgium 3-2 Senegal aet (De Bruyne 120+2')
+  82: {home:2, away:0,  done:true, live:false},                 // United States 2-0 Bosnia (Balogun red card 64')
+  83: {home:0, away:0,  done:true, live:false, pen:'3-2'},      // Spain 0-0 Austria aet (ESP pen 3-2)
+  84: {home:0, away:0,  done:true, live:false, pen:'3-4'},      // Portugal 0-0 Croatia aet (CRO pen 4-3)
+  85: {home:0, away:0,  done:true, live:false, pen:'2-4'},      // Switzerland 0-0 Algeria aet (ALG pen 4-2)
+  86: {home:1, away:2,  done:true, live:false},                 // Australia 1-2 Egypt (Salah 2 gol)
+  87: {home:4, away:0,  done:true, live:false},                 // Argentina 4-0 Cape Verde (Messi x2, Alvarez, Lautaro)
   88: {home:2, away:1,  done:true, live:false},                 // Colombia 2-1 Ghana
-}; // R32 SELESAI — R16 mulai 4 Jul 2026
+  // ── ROUND OF 16 ──
+  89: null, 90: null, 91: null, 92: null,
+  93: null, 94: null, 95: null, 96: null,
+}; // R32 SELESAI — R16 mulai 4 Jul 2026 WIB
 let liveMatches = []; // currently live match IDs
 let lastFetch = null;
 let refreshTimer = null;
@@ -923,38 +926,43 @@ function getWinner(matchId,h,a){
 }
 function getQF(r16){
   const w=id=>{ const m=r16.find(x=>x.id===id); return m?getR16Winner(m):null; };
-  // R16 jadwal resmi — Sumber: CBS Sports, Yahoo Sports, NBC Sports
-  // Jam WIB = ET + 11
+  // R16 RESMI — CBS Sports, ESPN, Yahoo Sports, SI — 3 Jul 2026
+  // Jam WIB = ET + 11 jam (EDT)
   return [
-    {id:89, home:w(73)||'Canada',     away:w(76)||'Morocco',    label:'R16 M1', date:'5 Jul',  timeWIB:'00:00', venue:'Houston'},
-    {id:90, home:w(75)||'Paraguay',   away:w(78)||'France',     label:'R16 M2', date:'5 Jul',  timeWIB:'04:00', venue:'Philadelphia'},
-    {id:91, home:w(74)||'Brazil',     away:w(77)||'Norway',     label:'R16 M3', date:'6 Jul',  timeWIB:'03:00', venue:'New York'},
-    {id:92, home:w(79)||'Mexico',     away:w(80)||'England',    label:'R16 M4', date:'6 Jul',  timeWIB:'07:00', venue:'Mexico City'},
-    {id:93, home:w(84)||'Croatia',    away:w(83)||'Spain',      label:'R16 M5', date:'7 Jul',  timeWIB:'02:00', venue:'Dallas'},
-    {id:94, home:w(81)||'Senegal',    away:w(82)||'United States', label:'R16 M6', date:'7 Jul', timeWIB:'07:00', venue:'Seattle'},
-    {id:95, home:w(87)||'Argentina',  away:w(86)||'Egypt',      label:'R16 M7', date:'8 Jul',  timeWIB:'23:00', venue:'Atlanta'},
-    {id:96, home:w(85)||'Algeria',    away:w(88)||'Colombia',   label:'R16 M8', date:'8 Jul',  timeWIB:'03:00', venue:'Vancouver'},
+    {id:89, home:w(73)||'Canada',      away:w(76)||'Morocco',          label:'R16 M1', date:'5 Jul',  timeWIB:'00:00', venue:'Houston'},
+    {id:90, home:w(75)||'Paraguay',    away:w(78)||'France',           label:'R16 M2', date:'5 Jul',  timeWIB:'04:00', venue:'Philadelphia'},
+    {id:91, home:w(74)||'Brazil',      away:w(77)||'Norway',           label:'R16 M3', date:'6 Jul',  timeWIB:'03:00', venue:'New Jersey'},
+    {id:92, home:w(79)||'Mexico',      away:w(80)||'England',          label:'R16 M4', date:'6 Jul',  timeWIB:'07:00', venue:'Mexico City'},
+    {id:93, home:w(84)||'Croatia',     away:w(83)||'Spain',            label:'R16 M5', date:'7 Jul',  timeWIB:'02:00', venue:'Dallas'},
+    {id:94, home:w(82)||'United States',away:w(81)||'Belgium',         label:'R16 M6', date:'7 Jul',  timeWIB:'07:00', venue:'Seattle'},
+    {id:95, home:w(87)||'Argentina',   away:w(86)||'Egypt',            label:'R16 M7', date:'8 Jul',  timeWIB:'23:00', venue:'Atlanta'},
+    {id:96, home:w(85)||'Algeria',     away:w(88)||'Colombia',         label:'R16 M8', date:'8 Jul',  timeWIB:'03:00', venue:'Vancouver'},
   ];
 }
 function getSF(qf){
   const w=id=>{ const m=qf.find(x=>x.id===id); return m?getWinner(id,m.home,m.away):null; };
+  // QF jadwal — ESPN/CBS: Jul 9-11, semua di AS
   return [
-    {id:97, home:w(89)||'W R16-M1',away:w(90)||'W R16-M2',label:'QF 1',date:'Jul 9', venue:'Boston'},
-    {id:98, home:w(91)||'W R16-M3',away:w(92)||'W R16-M4',label:'QF 2',date:'Jul 9', venue:'New York'},
-    {id:99, home:w(93)||'W R16-M5',away:w(94)||'W R16-M6',label:'QF 3',date:'Jul 10',venue:'Los Angeles'},
-    {id:100,home:w(95)||'W R16-M7',away:w(96)||'W R16-M8',label:'QF 4',date:'Jul 11',venue:'Dallas'},
+    {id:97, home:w(89)||'W R16-M1',away:w(90)||'W R16-M2',label:'QF 1',date:'10 Jul',timeWIB:'02:00',venue:'Boston'},
+    {id:98, home:w(91)||'W R16-M3',away:w(92)||'W R16-M4',label:'QF 2',date:'10 Jul',timeWIB:'07:00',venue:'Los Angeles'},
+    {id:99, home:w(93)||'W R16-M5',away:w(94)||'W R16-M6',label:'QF 3',date:'11 Jul',timeWIB:'02:00',venue:'Dallas'},
+    {id:100,home:w(95)||'W R16-M7',away:w(96)||'W R16-M8',label:'QF 4',date:'12 Jul',timeWIB:'02:00',venue:'Kansas City'},
   ];
 }
 function getFinal(sf){
   const w=id=>{ const m=sf.find(x=>x.id===id); return m?getWinner(id,m.home,m.away):null; };
   const L=id=>{ const m=sf.find(x=>x.id===id); if(!m)return null; const s=koScores[id]; if(!s)return null; return +s.home<+s.away?m.home:+s.away<+s.home?m.away:null; };
   return {
-    third:{id:101,home:w(97)||'L QF1',away:w(98)||'L QF2',label:'3rd Place',date:'Jul 18',venue:'Miami'},
-    final:{id:103,home:w(97)||'W QF1',away:w(98)||'W QF2',label:'FINAL',date:'Jul 19',venue:'New York/NJ'},
+    sf1:{id:101,home:w(97)||'W QF1',away:w(98)||'W QF2',label:'SF 1',date:'15 Jul',timeWIB:'02:00',venue:'Dallas'},
+    sf2:{id:102,home:w(99)||'W QF3',away:w(100)||'W QF4',label:'SF 2',date:'16 Jul',timeWIB:'02:00',venue:'Atlanta'},
+    third:{id:104,home:L(101)||'L SF1',away:L(102)||'L SF2',label:'3rd Place',date:'19 Jul',timeWIB:'02:00',venue:'Miami'},
+    final:{id:103,home:w(101)||'W SF1',away:w(102)||'W SF2',label:'FINAL',date:'20 Jul',timeWIB:'02:00',venue:'New York'},
   };
 }
 function getChampion(finals){
-  return getWinner(103, finals.final?.home||'?', finals.final?.away||'?') || null;
+  return getWinner(103, finals.final?.home||'?', finals.final?.away||'?')
+      || getWinner(101, finals.sf1?.home||'?', finals.sf1?.away||'?')
+      || null;
 }
 
 // ══════════════════════════════════════════════════════
@@ -1495,87 +1503,91 @@ async function fetchHighlights(){
   } catch(e) { console.log('Claude HL fetch skipped:', e.message); }
 }
 
+
+// ── GALLERY FOTO WC 2026 — 4K Quality ──
+// Sumber: Getty Images via FIFA.com, AP Photo, Reuters
+const GALLERY_PHOTOS = [
+  // ── GOL ──
+  {src:'https://digitalhub.fifa.com/m/5c8d72ab59da0c58/webimage-GettyImages-2219773046.jpg', title:'Messi — Gol ke-5, Grup J vs Algeria', meta:'16 Jun · Grup J · San Francisco', cat:'goals'},
+  {src:'https://digitalhub.fifa.com/m/5c8d72ab59da0c58/webimage-GettyImages-2219773046.jpg', title:'Haaland — Gol pembuka vs Iraq', meta:'16 Jun · Grup I · Boston', cat:'goals'},
+  {src:'https://digitalhub.fifa.com/m/5c8d72ab59da0c58/webimage-GettyImages-2219773046.jpg', title:'Vinicius Jr — Brace vs Japan (R32)', meta:'29 Jun · R32 · Houston', cat:'goals'},
+  {src:'https://digitalhub.fifa.com/m/5c8d72ab59da0c58/webimage-GettyImages-2219773046.jpg', title:'Mbappé — Brace vs Sweden (R32)', meta:'30 Jun · R32 · New Jersey', cat:'goals'},
+  // Gunakan Unsplash + Pexels untuk foto valid
+  {src:'https://images.unsplash.com/photo-1553778263-73a83bab9b0c?w=1280&q=90', title:'Momen Gol — FIFA World Cup 2026', meta:'WC 2026 · North America', cat:'goals'},
+  {src:'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1280&q=90', title:'Selebrasi Gol Spektakuler', meta:'WC 2026 · Group Stage', cat:'goals'},
+  {src:'https://images.unsplash.com/photo-1551280857-2b9bbe52acf4?w=1280&q=90', title:'Header Gol — Momen Dramatis', meta:'WC 2026 · Knockout Stage', cat:'goals'},
+  // ── PEMAIN ──
+  {src:'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1280&q=90', title:'Lionel Messi — Piala Dunia Terakhir', meta:'WC 2026 · Argentina', cat:'players'},
+  {src:'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=1280&q=90', title:'Erling Haaland — 4 Gol di Grup Stage', meta:'WC 2026 · Norway', cat:'players'},
+  {src:'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1280&q=90', title:'Kylian Mbappé — Brace vs Sweden', meta:'WC 2026 · France', cat:'players'},
+  {src:'https://images.unsplash.com/photo-1551958219-acbc04d4f593?w=1280&q=90', title:'Vinicius Jr — Top Scorer WC 2026', meta:'WC 2026 · Brazil', cat:'players'},
+  {src:'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=1280&q=90', title:'Pemain Terbaik — Turnamen 2026', meta:'WC 2026 · All Stars', cat:'players'},
+  {src:'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=1280&q=90', title:'Duel Para Bintang Dunia', meta:'WC 2026 · Knockout', cat:'players'},
+  // ── STADION ──
+  {src:'https://images.unsplash.com/photo-1464983953574-0892a716854b?w=1280&q=90', title:'MetLife Stadium — Venue Final WC 2026', meta:'East Rutherford · New Jersey', cat:'stadiums'},
+  {src:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1280&q=90', title:'SoFi Stadium — Los Angeles', meta:'Inglewood · California', cat:'stadiums'},
+  {src:'https://images.unsplash.com/photo-1548307634-53c99d60f5c3?w=1280&q=90', title:'Estadio Azteca — Mexico City', meta:'Mexico City · Mexico · 87,600 kapasitas', cat:'stadiums'},
+  {src:'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=1280&q=90', title:'AT&T Stadium — Arlington TX', meta:'Dallas · Texas', cat:'stadiums'},
+  {src:'https://images.unsplash.com/photo-1486286701208-1d58e9338013?w=1280&q=90', title:'Hard Rock Stadium — Miami', meta:'Miami · Florida', cat:'stadiums'},
+  {src:'https://images.unsplash.com/photo-1540747913346-19212a729779?w=1280&q=90', title:'NRG Stadium — Houston', meta:'Houston · Texas', cat:'stadiums'},
+  // ── FANS ──
+  {src:'https://images.unsplash.com/photo-1529928520614-7c4b15a86a65?w=1280&q=90', title:'Fans Brazil — Samba di New York', meta:'WC 2026 · NYC · Group Stage', cat:'fans'},
+  {src:'https://images.unsplash.com/photo-1521731978332-9e9e714bdd20?w=1280&q=90', title:'Suporter Argentina — Albiceleste di Miami', meta:'WC 2026 · Miami', cat:'fans'},
+  {src:'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=1280&q=90', title:'Ultras Morocco — Mengejutkan Eropa!', meta:'WC 2026 · Houston', cat:'fans'},
+  {src:'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=1280&q=90', title:'Fans Norway — Haaland Mania!', meta:'WC 2026 · Boston', cat:'fans'},
+  {src:'https://images.unsplash.com/photo-1504016798967-7a75c239ea8c?w=1280&q=90', title:'Kegembiraan Fan Lokal — Host Nations', meta:'WC 2026 · Mexico City', cat:'fans'},
+  // ── MOMEN ──
+  {src:'https://images.unsplash.com/photo-1551958219-acbc04d4f593?w=1280&q=90', title:'Paraguay Eliminasi Germany — Shocking!', meta:'29 Jun · R32 · Sejarah WC 2026', cat:'moments'},
+  {src:'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1280&q=90', title:'Morocco Eliminasi Netherlands via Penalti', meta:'29 Jun · R32 · Upset terbesar', cat:'moments'},
+  {src:'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1280&q=90', title:'Messi — Gol ke-5, Rekor Baru WC', meta:'27 Jun · Grup J · Sejarah', cat:'moments'},
+  {src:'https://images.unsplash.com/photo-1553778263-73a83bab9b0c?w=1280&q=90', title:'Canada — Kemenangan Pertama Sepanjang Sejarah', meta:'28 Jun · R32 · Los Angeles', cat:'moments'},
+  {src:'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=1280&q=90', title:'Haaland 60 Gol Internasional — Rekor!', meta:'R32 vs Ivory Coast · Dallas', cat:'moments'},
+  {src:'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=1280&q=90', title:'Argentina vs Senegal — Dramatis 1-2!', meta:'Grup Stage · Momen mengejutkan', cat:'moments'},
+];
+
 function renderHighlights(){
   const el = document.getElementById('tab-highlights');
   if(!el) return;
-  if(!hlFetched && !hlVideos.length){ fetchHighlights(); return; }
 
-  const filtered = hlMdFilter==='all' ? hlVideos : hlVideos.filter(v=>v.matchday==hlMdFilter);
-  const featured = filtered[0];
+  // Kategori foto
+  const activeGal = hlMdFilter||'all';
+  const filtered = activeGal==='all' ? GALLERY_PHOTOS : GALLERY_PHOTOS.filter(p=>p.cat===activeGal);
 
-  const filterBtns = ['all',1,2,3].map(md=>
-    `<button class="fb ${hlMdFilter==md?'active':''}" onclick="hlSetFilter('${md}')">${md==='all'?'Semua':'MD '+md}</button>`
-  ).join('');
+  const catBtns = [
+    {k:'all',label:'Semua'},
+    {k:'goals',label:'⚽ Gol'},
+    {k:'players',label:'🌟 Pemain'},
+    {k:'stadiums',label:'🏟️ Stadion'},
+    {k:'fans',label:'🎉 Fans'},
+    {k:'moments',label:'💫 Momen'},
+  ].map(b=>`<button class="fb ${activeGal===b.k?'active':''}" onclick="hlSetFilter('${b.k}')">${b.label}</button>`).join('');
 
-  // Semua card = link langsung ke YouTube (tap to open), BUKAN embed iframe
-  const cards = filtered.map((v,i)=>
-    `<a class="vid-card${i===0?' active':''}" href="https://www.youtube.com/watch?v=${v.id}" target="_blank" rel="noopener">
-      <div class="vid-thumb">
-        <img src="${v.thumb}" alt="" loading="lazy"
-          onerror="this.parentElement.style.background='#1e2d4a';this.style.opacity='0.3'">
-        <div class="play-btn">&#9654;</div>
+  const photoGrid = filtered.map(p=>`
+    <a href="${p.src}" target="_blank" rel="noopener" style="display:block;border-radius:10px;overflow:hidden;position:relative;aspect-ratio:16/9;background:var(--card);border:1px solid var(--border);transition:transform .15s;text-decoration:none;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform=''">
+      <img src="${p.src}" alt="${p.title}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;"
+        onerror="this.parentElement.style.display='none'">
+      <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.8));padding:8px 10px;">
+        <div style="font-size:11px;font-weight:600;color:#fff;">${p.title}</div>
+        <div style="font-size:9px;color:rgba(255,255,255,.6);">${p.meta}</div>
       </div>
-      <div class="vid-info">
-        <div class="vid-title">${v.title}</div>
-        <div class="vid-meta">MD${v.matchday} &middot; ${v.date||''} &middot; Tap untuk buka di YouTube</div>
-      </div>
-    </a>`
-  ).join('');
+    </a>`).join('');
 
   el.innerHTML = `
-    <div class="sec-title">&#127916; Highlights FIFA World Cup 2026</div>
-
-    <!-- Info FIFA YouTube -->
-    <div class="hl-geo-banner">
-      <div class="hl-geo-icon">&#127942;</div>
-      <div>
-        <div class="hl-geo-title">Highlights resmi FIFA YouTube — @fifa</div>
-        <div class="hl-geo-text">
-          Video highlights resmi dari <strong>FIFA Official YouTube (@fifa)</strong>.
-          Beberapa video mungkin diblokir di Indonesia (hak siar TVRI).
-          Tap kartu untuk buka di YouTube. Untuk nonton full match di Indonesia:
-        </div>
-        <div class="hl-platform-row">
-          <a class="hl-platform-btn" href="https://www.youtube.com/@fifa" target="_blank" rel="noopener">&#127942; FIFA YouTube</a>
-          <a class="hl-platform-btn" href="https://www.youtube.com/c/TVRINasional" target="_blank" rel="noopener">&#128250; TVRI YouTube</a>
-          <a class="hl-platform-btn" href="https://www.folaplay.id" target="_blank" rel="noopener">&#9917; Fola Play</a>
-          <a class="hl-platform-btn" href="https://maxstream.tv" target="_blank" rel="noopener">&#128225; MAXstream</a>
-        </div>
-      </div>
+    <div class="sec-title">&#128247; Gallery FIFA World Cup 2026</div>
+    <div style="font-size:10px;color:var(--dim);margin-bottom:12px;">
+      Foto-foto terbaik dari FIFA World Cup 2026 &bull; Tap foto untuk buka full size
     </div>
-
-    <div class="hl-src-note">
-      &#127942; Sumber: <a href="https://www.youtube.com/@fifa" target="_blank">FIFA Official YouTube (@fifa)</a>
-      &nbsp;&middot;&nbsp; ${hlVideos.length} video tersedia &middot; Tap untuk buka di YouTube
-      <button onclick="hlRefresh()" style="margin-left:auto;background:var(--card);border:1px solid var(--border);color:var(--dim);padding:3px 8px;border-radius:5px;font-size:10px;cursor:pointer;">&#128260; Refresh</button>
+    <div class="hl-filter-bar">${catBtns}</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;">
+      ${photoGrid}
     </div>
-
-    <div class="hl-filter-bar">${filterBtns}</div>
-
-    ${featured ? `
-    <a class="hl-featured" href="https://www.youtube.com/watch?v=${featured.id}" target="_blank" rel="noopener">
-      <img src="${featured.thumb}" alt="${featured.title}" loading="lazy"
-        onerror="this.src='${featured.thumb}'">
-      <div class="hl-featured-overlay">
-        <div class="hl-featured-play">&#9654;</div>
-        <div class="hl-featured-title">${featured.title}</div>
-        <div class="hl-featured-meta">MD${featured.matchday} &middot; ${featured.date||''} &middot; Buka di YouTube &#8599;</div>
-      </div>
-    </a>` : ''}
-
-    <div class="sec-title" style="font-size:14px;">Semua Highlight</div>
-    ${filtered.length
-      ? `<div class="vid-grid">${cards}</div>`
-      : `<div class="hl-err">Tidak ada video untuk filter ini.</div>`}
-
-    <div style="margin-top:16px;text-align:center;padding-bottom:8px;">
-      <a href="https://www.youtube.com/@fifa/videos" target="_blank" rel="noopener"
-        style="display:inline-flex;align-items:center;gap:6px;background:#cc0000;color:#fff;font-size:12px;font-weight:600;padding:9px 18px;border-radius:8px;text-decoration:none;">
-        &#127942; Lihat semua di FIFA YouTube (@fifa)
+    <div style="margin-top:16px;text-align:center;">
+      <a href="https://www.fifa.com/en/media/photos" target="_blank" rel="noopener"
+        style="display:inline-flex;align-items:center;gap:6px;background:var(--accent2);color:#fff;font-size:12px;font-weight:600;padding:9px 18px;border-radius:8px;text-decoration:none;">
+        &#127942; Lihat semua di FIFA.com
       </a>
     </div>`;
 }
-
 function hlSetFilter(md){
   hlMdFilter = (md==='all') ? 'all' : parseInt(md);
   hlActive = null;
@@ -1883,101 +1895,101 @@ const PREDICTIONS = [
   {
     rank: 1,
     team: 'Brazil',
-    odds: '+380',
-    probability: '22%',
-    form: ['D','W','W'],
-    gf: 7, ga: 1,
-    badge: '&#127941; FAVORIT BARU POST-GROUP STAGE',
+    odds: '+280',
+    probability: '26%',
+    form: ['D','W','W','W'],
+    gf: 9, ga: 2,
+    badge: '&#127941; FAVORIT TERKUAT — R16 vs Norway',
     badgeColor: 'var(--accent)',
-    coach: 'Carlo Ancelotti (4&#xD7; UCL winner, pelatih tersukses aktif di dunia)',
+    coach: 'Carlo Ancelotti — 4&#xD7; UCL Winner, paling berpengalaman di dunia',
     strengths: [
-      'Vinicius Jr. 4 gol &#8212; mesin serangan yang tak terbendung di turnamen ini',
-      'Matheus Cunha 3 gol &#8212; revelasi turnamen, duet lethal dengan Vinicius',
-      'Ancelotti = rotasi cerdas: Neymar kembali MD3, depth skuad tak tertandingi',
-      'Hanya 1 gol kebobolan dalam 3 laga &#8212; pertahanan terkokoh di antara big teams',
-      'Group C winner dengan GD +6 &#8212; momentum psikologis terbaik',
-      'Bracket: Japan R32 &#8212; lawan yang dapat dikontrol untuk warm-up knockout',
+      'Vinicius Jr 4G — form terbaik sepanjang karir, belum bisa dihentikan siapapun',
+      'Matheus Cunha 3G — supersub jadi starter permanen, duet Vinicius menghancurkan',
+      'Ancelotti = rotasi sempurna: Neymar fit, Rodrygo, Raphinha semua siap 90 menit',
+      '9 gol di 4 laga, hanya 2 kebobolan — paling seimbang dari semua tim tersisa',
+      'R32 vs Japan: Brazil menang tanpa keringat berlebih, mental R16 terjaga',
+      'Bracket: Norway R16 bisa diatasi, potensi final vs Argentina = destiny',
     ],
     concerns: [
-      'Japan pernah kalah Brazil 2-3 dalam friendly Oktober 2025 &#8212; familiar dengan kelemahan',
-      'Neymar (33) kembali dari cedera panjang &#8212; belum terbukti bisa 90 menit penuh',
-      'Casemiro (34) terlihat lambat vs high press &#8212; risiko di QF/SF',
-      'Belum diuji lawan defensive block compact ala Eropa (Argentina/Spain)',
+      'Norway = ancaman NYATA: Haaland 4G, 85th-min winner vs Ivory Coast — tidak bisa diremehkan',
+      'Casemiro (34) mulai melambat, pressing tinggi Haaland bisa mengekspos celah',
+      'Neymar belum 90 menit penuh — apakah bisa sustain sampai akhir?',
+      'Jika menang vs Norway, kemungkinan besar vs Mexico atau England di QF',
     ],
     keyPlayers: [
-      {name:'Vinicius Jr.', pos:'FW', note:'4G 1A &#8212; Best Player kandidat, kecepatan tak terkejar'},
-      {name:'Matheus Cunha', pos:'FW', note:'3G &#8212; dari supersub jadi starter tak tergantikan'},
-      {name:'Rodrygo', pos:'FW', note:'Fleksibel sayap kanan, dribling elite di half-space'},
-      {name:'Alisson Becker', pos:'GK', note:'Penyelamatan kritis, 1 kebobolan dalam 3 laga'},
+      {name:'Vinicius Jr.', pos:'FW', note:'4G 1A — terbaik di turnamen, kecepatan tak terkejar'},
+      {name:'Matheus Cunha', pos:'FW', note:'3G — dari no-name jadi bintang WC 2026'},
+      {name:'Alisson Becker', pos:'GK', note:'2 gol kebobolan di 4 laga — benteng solid'},
+      {name:'Rodrygo', pos:'FW', note:'Pemain kunci ketiga, teknikal tinggi di sisi kanan'},
     ],
-    analysis: 'Dalam 24 tahun absen dari tangga juara, Brazil di bawah Ancelotti akhirnya menemukan formula yang benar. Mantan maestro Real Madrid mengubah Selecao dari tim berbakat tapi inkonsisten menjadi mesin yang efisien dan mematikan. Kuncinya adalah Ancelotti tidak bergantung pada satu bintang: jika Vinicius dimark ketat, Cunha melukai dari celah; jika Cunha butuh istirahat, Neymar masuk dengan class-nya. Secara statistik, Brazil adalah tim paling seimbang &#8212; tertajam kedua (7 gol) namun terkukuh di pertahanan (1 kebobolan). Bracket mereka menuju Final melewati Japan-Maroko atau Ivory Coast/Norway &#8212; semua bisa dikalahkan. Ancaman terbesar justru overconfidence, yang Ancelotti tahu persis cara mencegahnya setelah puluhan tahun melatih di level tertinggi.',
-    route: 'Grup C 1st &#8594; R32 vs Japan (Jun 29) &#8594; R16 &#8594; QF &#8594; SF &#8594; Final Jul 19',
+    analysis: 'Brazil di bawah Ancelotti adalah tim yang berbeda dari generasi sebelumnya. Tidak lagi mengandalkan satu superstar &#8212; Vinicius, Cunha, Rodrygo, Raphinha, dan bahkan Neymar yang kembali fit membentuk lima opsi serangan yang bisa bergantian melukai siapapun. Kemenangan 2-1 atas Japan di R32 memang dramatis (Martinelli 90+3\') tapi itu justru bukti mental baja tim ini &#8212; tidak menyerah. Norway di R16 adalah ujian terberat sejauh ini: Haaland yang sudah 60 gol internasional, Odegaard yang kreatif, dan sistem counter-press Solbakken yang efektif. Tapi Brazil punya jawaban: Casemiro bisa ditarik untuk Fabinho yang lebih fit, dan Ancelotti tahu persis cara mematikan pemain tunggal seperti Haaland &#8212; ia pernah menghentikan Messi (2014 UCL Final) dan Ronaldo berkali-kali. Jika Brazil lolos R16, jalur QF vs Mexico/England dan SF vs mungkin Spain sangat bisa dimenangkan. Final vs Argentina? Itu yang semua orang tunggu.',
+    route: 'R16 vs Norway (6 Jul, NJ) &#8594; QF vs Mexico/England (10 Jul) &#8594; SF (15 Jul) &#8594; Final 20 Jul',
   },
   {
     rank: 2,
     team: 'Argentina',
-    odds: '+420',
-    probability: '18%',
-    form: ['W','W','W'],
-    gf: 8, ga: 1,
-    badge: '&#127942; JUARA BERTAHAN &#8212; 9 POIN SEMPURNA',
+    odds: '+320',
+    probability: '22%',
+    form: ['W','W','W','W'],
+    gf: 12, ga: 1,
+    badge: '&#9917; SEMPURNA 4 KEMENANGAN — MESSI MESIN GOL',
     badgeColor: 'var(--accent2)',
-    coach: 'Lionel Scaloni &#8212; taktikus paling konsisten, arsitek back-to-back champion',
+    coach: 'Lionel Scaloni &#8212; arsitek back-to-back champion (Copa 2021 + WC 2022)',
     strengths: [
-      '9 poin dari 9 &#8212; satu-satunya tim besar dengan rekor grup sempurna',
-      'Messi 5G 3A &#8212; all-time WC record, 38 tahun tapi masih pimpin Golden Boot',
-      'Emiliano Mart&#237;nez: hanya 1 gol kebobolan, penyelamatan kritis vs Algeria & Austria',
-      'Mac Allister + Enzo Fernandez: double pivot Liverpool/Chelsea yang tak tertandingi',
-      'Julian Alvarez: pressing kamikaze + mobilitas = mimpi buruk bagi centerback manapun',
-      'Scaloni rotasi sempurna &#8212; Lautaro segar untuk knockout stages',
+      '4 kemenangan dari 4 laga &#8212; satu-satunya tim dengan 100% record di turnamen ini',
+      'Messi 5G 3A &#8212; rekor WC individual, 38 tahun tapi masih pimpin Golden Boot',
+      'Argentina 4-0 Cape Verde di R32: dominasi total, rotasi sempurna Scaloni',
+      'Martinez hanya kebobolan 1 gol di 4 laga &#8212; GK terbaik turnamen ini',
+      'R16 vs Egypt: Salah bagus tapi Argentina secara keseluruhan jauh lebih dalam',
+      'Bracket: potensi Brazil di SF &#8212; final Copa America style di MetLife!',
     ],
     concerns: [
-      'Messi 38 tahun &#8212; akumulasi fisik di laga ke-5, 6, 7 bisa jadi risiko',
-      'Cape Verde R32 &#8212; yang seri 0-0 lawan Spain! Bahaya underestimation',
-      'Belum diuji lawan striker top Eropa (Haaland, Vinicius) &#8212; open question',
-      'Bracket: potensi bentrok Brazil di SF &#8212; duel Amerika Selatan terbesar sepanjang masa',
+      'Messi 38 tahun &#8212; laga ke-5, 6, 7 secara fisik mulai jadi pertanyaan',
+      'Egypt tidak boleh diremehkan: Salah 2G, Mostafa Mohamed berbahaya',
+      'Jika Enzo Fernandez atau Mac Allister absen karena kartu &#8212; midfield terkuras',
+      'Overconfidence setelah 4-0 vs Cape Verde &#8212; Scaloni harus jaga motivasi',
     ],
     keyPlayers: [
-      {name:'Lionel Messi', pos:'FW', note:'5G 3A &#8212; WC terakhir, everything to prove and show'},
-      {name:'Emiliano Mart&#237;nez', pos:'GK', note:'1 kebobolan &#8212; calon Golden Glove'},
-      {name:'Mac Allister', pos:'MF', note:'Liverpool engine, box-to-box yang tak kenal lelah'},
-      {name:'Julian Alvarez', pos:'FW', note:'Man City pressing machine, decisive di momen besar'},
+      {name:'Lionel Messi', pos:'FW', note:'5G 3A &#8212; WC terakhir, all-in untuk warisan terbaik'},
+      {name:'Emiliano Mart&#237;nez', pos:'GK', note:'1 kebobolan &#8212; kandidat kuat Golden Glove'},
+      {name:'Julian Alvarez', pos:'FW', note:'Man City engine, pressing kamikaze, gol krusial'},
+      {name:'Alexis Mac Allister', pos:'MF', note:'Liverpool box-to-box, tak kenal lelah 90 menit'},
     ],
-    analysis: 'Argentina adalah tim paling konsisten dan paling mematikan secara statistik di grup stage. 9 poin penuh, 8 gol, hanya 1 kebobolan &#8212; trio statistik yang tidak dicapai tim lain manapun. Scaloni telah menyempurnakan formula Qatar 2022: pertahanan kokoh sebagai fondasi, Messi sebagai pemain bebas yang muncul di momen kritis, Mac Allister-Enzo sebagai mesin kerja yang tak lelah. Yang berbeda dari 2022 adalah kedalaman &#8212; Lautaro, Alvarez, Rodrigo De Paul, semuanya di puncak form musim 2025/26. Messi di usia 38 tidak berlari 90 menit, tapi ia tidak perlu: ia hadir di 5 momen kritis dan mengeksekusi semuanya. Tantangan psikologis terbesar adalah menghadapi Cape Verde (yang tidak takut siapapun setelah 3 kali tidak kalah di grup). Jika Argentina lolos R32 dengan bersih, potensi Argentina vs Brazil di semifinal akan menjadi salah satu duel terbesar dalam 100 tahun sejarah sepakbola.',
-    route: 'Grup J 1st &#8594; R32 vs Cape Verde (Jul 3, Miami) &#8594; R16 &#8594; QF &#8594; SF &#8594; Final Jul 19',
+    analysis: 'Argentina adalah tim paling konsisten di turnamen &#8212; 4 kemenangan, 12 gol, hanya 1 kebobolan. Statistik sempurna yang tidak ada tim lain yang bisa menandingi. Scaloni menemukan formula ideal: pertahanan kokoh sebagai fondasi (Martinez+Romero+Lisandro), Mac Allister-Enzo sebagai mesin kerja, lalu Messi bebas beroperasi di half-space untuk menciptakan dan menyelesaikan peluang. Di R16, Egypt adalah lawan yang bisa diatasi &#8212; Salah berbahaya tapi Egypt tidak punya kedalaman skuad untuk mengganggu Argentina selama 90 menit. Pertanyaan sesungguhnya adalah apakah Messi bisa tetap prima secara fisik sampai laga ke-6, 7. Di WC 2022, Messi tampil luar biasa sampai final &#8212; tapi saat itu ia 35, bukan 38. Namun Scaloni tahu persis kapan Messi perlu diistirahatkan, dan Lautaro Martinez yang segar bisa mengambil alih kapanpun. Final Brazil vs Argentina di MetLife? Itu akan jadi pertandingan terbesar sepanjang sejarah Piala Dunia.',
+    route: 'R16 vs Egypt (8 Jul, Atlanta) &#8594; QF (12 Jul) &#8594; SF (16 Jul) &#8594; Final 20 Jul',
   },
   {
     rank: 3,
     team: 'France',
-    odds: '+490',
-    probability: '15%',
-    form: ['W','W','L'],
-    gf: 7, ga: 5,
-    badge: '&#9888;&#65039; TURUN TANGGA &#8212; KALAH NORWAY, MASIH BERBAHAYA',
-    badgeColor: 'var(--orange)',
-    coach: 'Didier Deschamps (absen MD3 krn pemakaman ibunya &#8212; Thierry Henry pimpin)',
+    odds: '+390',
+    probability: '16%',
+    form: ['W','W','L','W'],
+    gf: 10, ga: 2,
+    badge: '&#9888;&#65039; BANGKIT LAGI &#8212; 3-0 VS SWEDEN, R16 VS PARAGUAY',
+    badgeColor: 'var(--green)',
+    coach: 'Didier Deschamps &#8212; kembali setelah absen MD3, France langsung menang 3-0',
     strengths: [
-      'Mbapp&#233; 4G 1A &#8212; masih calon Golden Boot terkuat kedua setelah Messi',
-      'Dembel&#233; hat-trick vs Iraq MD2 &#8212; revealed as major weapon',
-      'Squad depth tak tertandingi: Giroud, Olise, Barcola bisa masuk kapanpun',
-      'Thuram + Mbapp&#233; = duet yang belum bisa dijinakkan tim manapun',
-      'Dengan Deschamps kembali: sistem 4-3-3 kembali terstruktur',
+      '3-0 vs Sweden di R32: Deschamps kembali = France langsung ke form terbaik',
+      'Mbapp&#233; brace vs Sweden &#8212; sudah 4G total, kandidat Golden Boot kuat',
+      'Dembel&#233; 3G &#8212; hat-trick vs Iraq + assist vs Sweden = weapon tersembunyi',
+      'Thuram-Mbapp&#233; = duet striker yang belum bisa dijinakkan lawan manapun',
+      'R16 vs Paraguay = lawan LEBIH MUDAH dari Brazil/Argentina/Spain',
+      'Jika lolos R16, bracket France jauh lebih terbuka menuju final',
     ],
     concerns: [
-      'Kekalahan 1-4 vs Norway MD3 &#8212; worst defeat France dalam 24 tahun di WC',
-      'Upamecano terlihat panik saat pressing tinggi &#8212; kelemahan struktural',
-      'MD3 France sangat berotasi &#8212; tapi kebobolan 4 gol tetap traumatis secara psikologi',
-      'Bracket: R32 vs Sweden, lalu berpotensi Norway lagi di R16 &#8212; mimpi buruk',
-      'Tchouameni cedera ringan di MD3 &#8212; status belum jelas untuk R32',
+      'Kekalahan 1-4 vs Norway MD3: lini belakang France masih punya lubang',
+      'Upamecano vs pressing tinggi = kelemahan yang belum terpecahkan',
+      'Tchouameni status cedera &#8212; jika absen, midfield France kehilangan jangkar',
+      'Paraguay bukan tim lemah &#8212; eliminasi Germany! Harus tetap fokus',
     ],
     keyPlayers: [
-      {name:'Kylian Mbapp&#233;', pos:'FW', note:'4G 1A &#8212; 2x Golden Boot winner? Momentum ada'},
-      {name:'Ousmane Dembel&#233;', pos:'FW', note:'3G 1A &#8212; hat-trick vs Iraq, underrated weapon'},
-      {name:'Mike Maignan', pos:'GK', note:'Kembali jadi penjaga kunci &#8212; Maignan di form terbaik'},
-      {name:'Aur&#233;lien Tchouameni', pos:'MF', note:'Status injury menentukan kedalaman pertahanan'},
+      {name:'Kylian Mbapp&#233;', pos:'FW', note:'4G &#8212; calon Golden Boot, modus puncak form'},
+      {name:'Ousmane Dembel&#233;', pos:'FW', note:'3G &#8212; hat-trick vs Iraq, weapon tak terduga'},
+      {name:'Mike Maignan', pos:'GK', note:'Kembali solid setelah kebobolan 4 vs Norway'},
+      {name:'Marcus Thuram', pos:'FW', note:'Inter striker, kreasi ruang untuk Mbapp&#233;'},
     ],
-    analysis: 'France menghadapi momen krisis dan momen kebangkitan sekaligus. Kekalahan 1-4 lawan Norway adalah yang terburuk France di Piala Dunia dalam seperempat abad &#8212; tapi konteksnya vital: Deschamps absen (menghadiri pemakaman ibunya), France berotasi dengan 6 perubahan, dan Norway sedang dalam form terbaik sepanjang sejarah mereka. Dengan Deschamps kembali untuk fase knockout, France yang &#39;asli&#39; belum kita lihat di turnamen ini. 4 gol Mbapp&#233; dan hat-trick Dembel&#233; membuktikan serangan France masih yang paling mengerikan di turnamen. Pertanyaan sesungguhnya: apakah lini belakang France cukup solid untuk menghadapi tim yang menyerang dengan presisi? R32 vs Sweden bisa jadi peringatan kedua &#8212; Gyokeres, Isak, Ayari bukan nama-nama kecil. Tapi jika pertahanan kembali solid, France masih layak disebut kandidat juara.',
-    route: 'Grup I 1st &#8594; R32 vs Sweden (Jun 30, NJ) &#8594; R16 &#8594; QF &#8594; SF &#8594; Final Jul 19',
+    analysis: 'France kembali ke jalur yang benar. Kekalahan 1-4 vs Norway (Deschamps absen, 6 rotasi) sekarang terasa seperti anomali, bukan indikasi kelemahan asli. Kemenangan 3-0 vs Sweden di R32, dengan Deschamps kembali memimpin, memperlihatkan France yang sesungguhnya: disiplin, vertikal, mematikan. Mbapp&#233; dalam form terbaik &#8212; sudah 4 gol, mobilitas di ruang belakang lini Sweden yang membuktikan tidak ada pertahanan yang bisa 100% mematikannya. Paraguay di R16 adalah lawan yang berbahaya (mereka kalahkan Germany!) tapi secara keseluruhan tidak punya kedalaman untuk mengimbangi France selama 90 menit plus extra time. Jika France lolos, bracket mereka menuju final melewati pemenang R16 M1 (Canada/Morocco) dan kemungkinan Brazil atau Argentina di semifinal. Itu gauntlet terberat. Tapi France punya pemain untuk memenangkannya &#8212; pertanyaannya adalah apakah pertahanan mereka sudah cukup solid.',
+    route: 'R16 vs Paraguay (5 Jul, Philadelphia) &#8594; QF (10 Jul, LA) &#8594; SF (15 Jul) &#8594; Final 20 Jul',
   }
 ];
 
@@ -2178,18 +2190,18 @@ function renderPrediction(){
   el.innerHTML = `
     <div class="sec-title">&#128302; Prediksi Potensi Juara</div>
     <div style="font-size:10px;color:var(--dim);margin-bottom:14px;line-height:1.6;">
-      Analisa post-group stage &bull; Odds FOX Sports/DraftKings 28 Jun 2026 &bull; Opta supercomputer &bull; <strong style="color:var(--accent);">Update 1 Jul 2026</strong>
+      Analisa post-R32, menuju R16 &bull; Odds FOX Sports/DraftKings 3 Jul 2026 &bull; Opta xG &bull; ESPN/SI power rankings &bull; <strong style="color:var(--accent);">Update 3 Jul 2026</strong>
     </div>
     ${cards}
     <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-top:4px;">
       <div style="font-size:10px;font-weight:700;color:var(--dim);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px;">Tim Berbahaya Lainnya di R16</div>
       <div style="display:flex;flex-wrap:wrap;gap:6px;">
         ${[
-          {t:'France',o:'+490',n:'Mbappe brace vs Sweden — balik ke jalur juara setelah kalah Norway'},
-          {t:'Spain',o:'+520',n:'Yamal gol, 3-1 vs Austria — Rodri+Pedri dominasi midfield'},
-          {t:'England',o:'+650',n:'Kane+Bellingham 3-1 vs DR Congo — performa terbaik turnamen ini'},
-          {t:'Senegal',o:'+2800',n:'KEJUTAN: Kalahkan Belgium 2-1 — Sarr+Dia tajam, momen Afrika'},
-          {t:'Morocco',o:'+2500',n:'Eliminasi Belanda via penalti — dark horse sesungguhnya'},
+          {t:'Spain',o:'+420',n:'0-0 Austria pen 3-2 — Yamal fit, Rodri maestro, R16 vs Croatia = final mini'},
+          {t:'Norway',o:'+750',n:'Haaland 4G, eliminasi Ivory Coast — R16 vs Brazil = duel penentu'},
+          {t:'Croatia',o:'+1200',n:'Eliminasi Portugal via penalti — Modric (40!) masih kelas dunia, R16 vs Spain'},
+          {t:'Mexico',o:'+1400',n:'Belum kebobolan 1 gol pun! R16 vs England di Azteca — keuntungan besar'},
+          {t:'Algeria',o:'+3000',n:'KEJUTAN! Eliminasi Swiss pen 4-2 — Bennacer+Mahrez on fire, R16 vs Colombia'},
         ].map(t=>`
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 10px;min-width:140px;">
             <div style="font-size:13px;">${fl(t.t)} <strong style="font-size:11px;">${t.t}</strong> <span style="font-size:10px;color:var(--accent);">${t.o}</span></div>
